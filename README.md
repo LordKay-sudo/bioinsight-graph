@@ -2,6 +2,7 @@
 
 **Disease–target knowledge graph** — ingest public association data into Neo4j, query via FastAPI, explore with a React/TypeScript UI.
 
+[![CI](https://github.com/LordKay-sudo/bioinsight-graph/actions/workflows/ci.yml/badge.svg)](https://github.com/LordKay-sudo/bioinsight-graph/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776ab)](api/requirements.txt)
 [![Neo4j 5](https://img.shields.io/badge/neo4j-5.x-008CC1)](docker-compose.yml)
@@ -21,7 +22,8 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 | FastAPI search & neighbor endpoints | ✅ |
 | React search + gene detail UI | ✅ |
 | Force-directed graph view | ✅ |
-| Full Docker Compose stack + CI | 🔜 Phase 5–6 |
+| Full Docker Compose stack | ✅ |
+| GitHub Actions CI | ✅ |
 
 **Data (MVP):** Representative sample inspired by [Open Targets](https://www.opentargets.org/) — 30+ genes, 12 diseases, 105 disease–target associations, 10 protein links. Suitable for demos; not clinical-grade.
 
@@ -64,6 +66,26 @@ cd web && npm install && npm run dev
 | Neo4j Browser | http://localhost:7474 (`neo4j` / `changeme`) |
 
 Try searching **BRCA1** in the UI, then open the gene detail view for associated diseases and proteins.
+
+### Docker (all-in-one)
+
+Runs Neo4j, seeds sample data, API, and nginx-served web UI:
+
+```bash
+docker compose up --build
+```
+
+| Service | URL |
+|---------|-----|
+| **Web UI** | http://localhost:8080 |
+| API docs | http://localhost:8000/docs |
+| Neo4j Browser | http://localhost:7474 |
+
+The `seed` service runs once per `compose up` (loads Open Targets–style sample data). To re-seed:
+
+```bash
+docker compose run --rm seed
+```
 
 ---
 
@@ -140,11 +162,13 @@ Stack: React 18, TypeScript, Vite. Dev server proxies `/api` → `localhost:8000
 
 ```
 bioinsight-graph/
-├── api/              # FastAPI application + pytest
-├── web/              # React explorer
+├── .github/workflows/ci.yml
+├── api/              # FastAPI + Dockerfile
+├── web/              # React + nginx Dockerfile
 ├── scripts/          # download → ETL → seed_neo4j
-├── data/             # raw/ and processed/ (gitignored outputs)
+├── docs/             # README screenshots
 ├── docker-compose.yml
+├── Dockerfile.seed   # one-shot graph seed job
 └── .env.example
 ```
 
@@ -167,8 +191,8 @@ cd web && npm run build
 | 0–2 | Neo4j, ETL, FastAPI ✅ |
 | 3 | React search + gene detail ✅ |
 | 4 | Graph visualization + `/export/subgraph` ✅ |
-| 5 | Docker Compose (api + web + neo4j) |
-| 6 | GitHub Actions CI |
+| 5 | Docker Compose (api + web + neo4j + seed) ✅ |
+| 6 | GitHub Actions CI ✅ |
 
 **Related project:** [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo) — unstructured documents → knowledge graph → RAG Q&A.
 
