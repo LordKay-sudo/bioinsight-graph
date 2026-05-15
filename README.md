@@ -128,7 +128,9 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | `/gene/:id` | Gene detail — graph view + neighbor table |
 | `/about` | Data provenance, schema, limitations |
 
-![BRCA1 subgraph graph view](docs/screenshot-graph.png)
+![BRCA1 subgraph — force-directed 1-hop neighborhood](docs/screenshot-graph.png)
+
+Full gene detail page (stats + graph + legend): [screenshot-gene-detail.png](docs/screenshot-gene-detail.png)
 
 Stack: React 18, TypeScript, Vite. Dev server proxies `/api` → `localhost:8000`.
 

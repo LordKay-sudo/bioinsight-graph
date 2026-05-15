@@ -164,7 +164,7 @@ export default function GeneDetail() {
       </div>
 
       {view === "graph" && subgraph && (
-        <>
+        <section className="graph-section">
           <ForceGraphView centerGeneId={gene.id} nodes={subgraph.nodes} links={subgraph.links} />
           <div className="graph-legend">
             <span className="legend-item">
@@ -177,7 +177,7 @@ export default function GeneDetail() {
               <span className="legend-dot" style={{ background: "#a78bfa" }} /> Protein
             </span>
           </div>
-        </>
+        </section>
       )}
 
       {view === "table" && (
