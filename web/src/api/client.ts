@@ -43,6 +43,26 @@ export interface StatsResponse {
   associations: number;
 }
 
+export interface SubgraphNode {
+  id: string;
+  label: string;
+  name?: string | null;
+  symbol?: string | null;
+}
+
+export interface SubgraphLink {
+  source: string;
+  target: string;
+  type: string;
+  score?: number | null;
+}
+
+export interface SubgraphResponse {
+  gene_id: string;
+  nodes: SubgraphNode[];
+  links: SubgraphLink[];
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`);
   if (!res.ok) {
@@ -61,5 +81,9 @@ export const api = {
   getNeighbors: (id: string) =>
     fetchJson<NeighborsResponse>(`/api/v1/genes/${encodeURIComponent(id)}/neighbors`),
   getStats: () => fetchJson<StatsResponse>("/api/v1/stats"),
+  getSubgraph: (geneId: string) =>
+    fetchJson<SubgraphResponse>(
+      `/api/v1/export/subgraph?gene_id=${encodeURIComponent(geneId)}`
+    ),
   health: () => fetchJson<{ status: string; neo4j: boolean }>("/api/v1/health"),
 };

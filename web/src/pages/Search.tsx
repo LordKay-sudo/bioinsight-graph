@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, type DiseaseSummary, type GeneSummary, type StatsResponse } from "../api/client";
+import { DEMO_STATS, filterDemoGenes } from "../demo/data";
 import { useDebounce } from "../hooks/useDebounce";
 
 type Tab = "genes" | "diseases";
@@ -15,9 +16,16 @@ export default function Search() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
-    api.getStats().then(setStats).catch(() => {});
+    api
+      .getStats()
+      .then(setStats)
+      .catch(() => {
+        setStats(DEMO_STATS);
+        setDemoMode(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -31,15 +39,30 @@ export default function Search() {
     setLoading(true);
     setError(null);
 
+    if (demoMode && tab === "genes") {
+      setGenes(filterDemoGenes(debouncedQuery));
+      setDiseases([]);
+      setLoading(false);
+      return;
+    }
+
     const search =
       tab === "genes"
         ? api.searchGenes(debouncedQuery).then(setGenes)
         : api.searchDiseases(debouncedQuery).then(setDiseases);
 
     search
-      .catch((e: Error) => setError(e.message))
+      .catch((e: Error) => {
+        if (tab === "genes") {
+          setGenes(filterDemoGenes(debouncedQuery));
+          setDemoMode(true);
+          setError(null);
+        } else {
+          setError(e.message);
+        }
+      })
       .finally(() => setLoading(false));
-  }, [debouncedQuery, tab]);
+  }, [debouncedQuery, tab, demoMode]);
 
   const results = tab === "genes" ? genes : diseases;
   const showEmpty = debouncedQuery.length >= 1 && !loading && !error && results.length === 0;

@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import ForceGraphView from "../components/ForceGraphView";
 import {
   api,
   type GeneDetail as GeneDetailType,
   type NeighborEdge,
   type NeighborNode,
+  type SubgraphLink,
+  type SubgraphNode,
 } from "../api/client";
+import { DEMO_GENE_DETAIL, DEMO_NEIGHBORS, DEMO_SUBGRAPH } from "../demo/data";
+
+type ViewMode = "table" | "graph";
 
 function nodeLabel(n: NeighborNode): string {
   if (n.label === "Gene") return n.symbol ?? n.id;
@@ -38,8 +44,12 @@ function neighborRows(
 
 export default function GeneDetail() {
   const { geneId } = useParams<{ geneId: string }>();
+  const [view, setView] = useState<ViewMode>("graph");
   const [gene, setGene] = useState<GeneDetailType | null>(null);
   const [neighbors, setNeighbors] = useState<{ nodes: NeighborNode[]; edges: NeighborEdge[] } | null>(
+    null
+  );
+  const [subgraph, setSubgraph] = useState<{ nodes: SubgraphNode[]; links: SubgraphLink[] } | null>(
     null
   );
   const [loading, setLoading] = useState(true);
@@ -47,16 +57,44 @@ export default function GeneDetail() {
 
   useEffect(() => {
     if (!geneId) return;
+    let cancelled = false;
     setLoading(true);
     setError(null);
 
-    Promise.all([api.getGene(geneId), api.getNeighbors(geneId)])
-      .then(([g, n]) => {
+    const applyDemo = () => {
+      if (geneId !== DEMO_GENE_DETAIL.id) return false;
+      setGene(DEMO_GENE_DETAIL);
+      setNeighbors({ nodes: DEMO_NEIGHBORS.nodes, edges: DEMO_NEIGHBORS.edges });
+      setSubgraph({ nodes: DEMO_SUBGRAPH.nodes, links: DEMO_SUBGRAPH.links });
+      return true;
+    };
+
+    const fallbackTimer = window.setTimeout(() => {
+      if (!cancelled && applyDemo()) setLoading(false);
+    }, 1200);
+
+    Promise.all([api.getGene(geneId), api.getNeighbors(geneId), api.getSubgraph(geneId)])
+      .then(([g, n, sg]) => {
+        if (cancelled) return;
         setGene(g);
         setNeighbors({ nodes: n.nodes, edges: n.edges });
+        setSubgraph({ nodes: sg.nodes, links: sg.links });
       })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (cancelled) return;
+        if (!applyDemo()) {
+          setError("Gene not found — start Neo4j and seed data for live results.");
+        }
+      })
+      .finally(() => {
+        window.clearTimeout(fallbackTimer);
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallbackTimer);
+    };
   }, [geneId]);
 
   if (loading) {
@@ -108,46 +146,83 @@ export default function GeneDetail() {
         </div>
       </div>
 
-      <h3 style={{ marginBottom: "1rem" }}>1-hop neighbors</h3>
+      <div className="view-tabs">
+        <button
+          type="button"
+          className={`tab ${view === "graph" ? "active" : ""}`}
+          onClick={() => setView("graph")}
+        >
+          Graph view
+        </button>
+        <button
+          type="button"
+          className={`tab ${view === "table" ? "active" : ""}`}
+          onClick={() => setView("table")}
+        >
+          Neighbor table
+        </button>
+      </div>
 
-      {rows.length === 0 ? (
-        <div className="state-box">No neighbors found for this gene.</div>
-      ) : (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Name</th>
-                <th>ID</th>
-                <th>Relationship</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={`${r.id}-${r.relation}`}>
-                  <td>
-                    <span
-                      className={`badge badge-${r.type.toLowerCase()}`}
-                      style={
-                        r.type === "Protein"
-                          ? { background: "rgba(167,139,250,0.15)", color: "var(--protein)" }
-                          : undefined
-                      }
-                    >
-                      {r.type}
-                    </span>
-                  </td>
-                  <td>{r.name}</td>
-                  <td className="mono">{r.id}</td>
-                  <td>{r.relation}</td>
-                  <td>{r.score}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {view === "graph" && subgraph && (
+        <>
+          <ForceGraphView centerGeneId={gene.id} nodes={subgraph.nodes} links={subgraph.links} />
+          <div className="graph-legend">
+            <span className="legend-item">
+              <span className="legend-dot" style={{ background: "#34d399" }} /> Gene
+            </span>
+            <span className="legend-item">
+              <span className="legend-dot" style={{ background: "#f472b6" }} /> Disease
+            </span>
+            <span className="legend-item">
+              <span className="legend-dot" style={{ background: "#a78bfa" }} /> Protein
+            </span>
+          </div>
+        </>
+      )}
+
+      {view === "table" && (
+        <>
+          <h3 style={{ marginBottom: "1rem" }}>1-hop neighbors</h3>
+          {rows.length === 0 ? (
+            <div className="state-box">No neighbors found for this gene.</div>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Relationship</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={`${r.id}-${r.relation}`}>
+                      <td>
+                        <span
+                          className={`badge badge-${r.type.toLowerCase()}`}
+                          style={
+                            r.type === "Protein"
+                              ? { background: "rgba(167,139,250,0.15)", color: "var(--protein)" }
+                              : undefined
+                          }
+                        >
+                          {r.type}
+                        </span>
+                      </td>
+                      <td>{r.name}</td>
+                      <td className="mono">{r.id}</td>
+                      <td>{r.relation}</td>
+                      <td>{r.score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
     </>
   );

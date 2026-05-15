@@ -47,3 +47,23 @@ class StatsResponse(BaseModel):
     diseases: int
     proteins: int
     associations: int
+
+
+class SubgraphNode(BaseModel):
+    id: str
+    label: str
+    name: str | None = None
+    symbol: str | None = None
+
+
+class SubgraphLink(BaseModel):
+    source: str
+    target: str
+    type: str
+    score: float | None = None
+
+
+class SubgraphResponse(BaseModel):
+    gene_id: str
+    nodes: list[SubgraphNode]
+    links: list[SubgraphLink]

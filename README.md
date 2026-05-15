@@ -20,10 +20,12 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 | Open Targets–style seed pipeline | ✅ |
 | FastAPI search & neighbor endpoints | ✅ |
 | React search + gene detail UI | ✅ |
-| Force-directed graph view | 🔜 Phase 4 |
+| Force-directed graph view | ✅ |
 | Full Docker Compose stack + CI | 🔜 Phase 5–6 |
 
 **Data (MVP):** Representative sample inspired by [Open Targets](https://www.opentargets.org/) — 30+ genes, 12 diseases, 105 disease–target associations, 10 protein links. Suitable for demos; not clinical-grade.
+
+![BioInsight Graph search UI](docs/screenshot-search.png)
 
 ---
 
@@ -114,6 +116,7 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | `GET` | `/diseases?q=` | Search diseases |
 | `GET` | `/genes/{id}` | Gene metadata + degree counts |
 | `GET` | `/genes/{id}/neighbors` | 1-hop subgraph (JSON nodes + edges) |
+| `GET` | `/export/subgraph?gene_id=` | Subgraph for force-directed visualization |
 
 ---
 
@@ -122,8 +125,10 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | Route | Page |
 |-------|------|
 | `/` | Search genes and diseases (debounced, tabbed) |
-| `/gene/:id` | Gene detail + neighbor relationship table |
+| `/gene/:id` | Gene detail — graph view + neighbor table |
 | `/about` | Data provenance, schema, limitations |
+
+![BRCA1 subgraph graph view](docs/screenshot-graph.png)
 
 Stack: React 18, TypeScript, Vite. Dev server proxies `/api` → `localhost:8000`.
 
@@ -159,7 +164,7 @@ cd web && npm run build
 |-------|--------|
 | 0–2 | Neo4j, ETL, FastAPI ✅ |
 | 3 | React search + gene detail ✅ |
-| 4 | Graph visualization + `/export/subgraph` |
+| 4 | Graph visualization + `/export/subgraph` ✅ |
 | 5 | Docker Compose (api + web + neo4j) |
 | 6 | GitHub Actions CI |
 
