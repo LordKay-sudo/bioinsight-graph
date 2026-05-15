@@ -218,6 +218,8 @@ uvicorn app.main:app --reload --port 8000
 
 ### 5. Run web
 
+Requires **Node.js 20+**.
+
 ```bash
 cd web
 npm install
@@ -225,6 +227,8 @@ npm run dev
 ```
 
 Open http://localhost:5173
+
+The UI proxies API calls to `http://localhost:8000` (see `web/vite.config.ts`).
 
 ---
 
@@ -261,7 +265,7 @@ Document ports in README after implementation.
 | **0** | Repo scaffold, Docker Neo4j, init constraints |
 | **1** | ETL + seed script + sample data committed or scripted |
 | **2** | FastAPI read endpoints + OpenAPI + tests |
-| **3** | React search + gene detail |
+| **3** | React search + gene detail ✅ |
 | **4** | Graph visualization + export endpoint |
 | **5** | Docker Compose all-in-one + README screenshots |
 | **6** | GitHub Actions CI + optional minikube manifests |
