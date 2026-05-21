@@ -139,9 +139,9 @@ flowchart LR
   API --> WEB
 ```
 
-### Research platform (optional MCP + RAG)
+### Integrations (MCP + RAG)
 
-BioInsight Graph remains a **standalone** application. These companions add agent and literature layers without changing the core app:
+BioInsight Graph is the full application (ETL → Neo4j → API → UI). Separate repos add agent or document layers via the same APIs — they do not replace this codebase:
 
 ```mermaid
 flowchart TB
@@ -155,8 +155,8 @@ flowchart TB
   MCP -. optional .-> RAG
 ```
 
-| Companion | Repository |
-|-----------|------------|
+| Integration | Repository |
+|-------------|------------|
 | MCP tools + `research_gene` agent | [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp) |
 | Citation-grounded document Q&A | [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo) |
 

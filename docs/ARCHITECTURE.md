@@ -15,7 +15,7 @@ flowchart TB
     API[FastAPI :8000]
     N4j[(Neo4j :7474 / :7687)]
   end
-  subgraph optional [Optional companions]
+  subgraph integrations [Integrations]
     MCP[embabel-mcp :1337]
     RAG[kg-rag-demo :8001]
   end
