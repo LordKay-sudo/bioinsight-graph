@@ -81,6 +81,18 @@ docker compose up --build
 | API docs | http://localhost:8000/docs |
 | Neo4j Browser | http://localhost:7474 |
 
+#### MCP server (optional)
+
+With [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp) cloned as a sibling directory (`../embabel-mcp`), set `OPENAI_API_KEY` in `.env`, then:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.mcp.yml up --build
+```
+
+| Service | URL |
+|---------|-----|
+| MCP (SSE) | http://localhost:1337/sse |
+
 The `seed` service runs once per `compose up` (loads Open Targets–style sample data). To re-seed:
 
 ```bash
