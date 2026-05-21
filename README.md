@@ -29,6 +29,14 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 
 ![BioInsight Graph search UI](docs/screenshot-search.png)
 
+### UI gallery
+
+| Search | Force-directed graph | Gene detail |
+|--------|----------------------|-------------|
+| ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
+
+Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md).
+
 ---
 
 ## Quick start
@@ -121,6 +129,27 @@ flowchart LR
   API --> WEB
 ```
 
+### Research platform (optional MCP + RAG)
+
+BioInsight Graph remains a **standalone** application. These companions add agent and literature layers without changing the core app:
+
+```mermaid
+flowchart TB
+  UI[BioInsight Web UI :8080]
+  API[BioInsight API :8000]
+  N4j[(Neo4j)]
+  MCP[embabel-mcp :1337]
+  RAG[kg-rag-demo :8001]
+  UI --> API --> N4j
+  MCP --> API
+  MCP -. optional .-> RAG
+```
+
+| Companion | Repository |
+|-----------|------------|
+| MCP tools + `research_gene` agent | [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp) |
+| Citation-grounded document Q&A | [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo) |
+
 ---
 
 ## Graph model
@@ -135,6 +164,32 @@ flowchart LR
 ```
 
 Unique constraints on `Gene.id`, `Disease.id`, and `Protein.id` — see `scripts/neo4j/init.cypher`.
+
+### Entity–relationship diagram
+
+```mermaid
+erDiagram
+  GENE ||--o{ ASSOCIATED_WITH : scores
+  DISEASE ||--o{ ASSOCIATED_WITH : scores
+  PROTEIN }o--|| GENE : encodes
+  GENE {
+    string id PK
+    string symbol
+    string name
+  }
+  DISEASE {
+    string id PK
+    string name
+  }
+  PROTEIN {
+    string id PK
+    string name
+  }
+  ASSOCIATED_WITH {
+    float score
+    string source
+  }
+```
 
 ---
 
@@ -209,8 +264,10 @@ cd web && npm run build
 | 4 | Graph visualization + `/export/subgraph` ✅ |
 | 5 | Docker Compose (api + web + neo4j + seed) ✅ |
 | 6 | GitHub Actions CI ✅ |
+| 7+ | Ranked API endpoints (gene/disease compare) ✅ |
+| MCP | [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp) tools, resources, `research_gene` agent ✅ |
 
-**Related project:** [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo) — unstructured documents → knowledge graph → RAG Q&A.
+**Related project:** [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo) — unstructured documents → knowledge graph → RAG Q&A (optional MCP bridge).
 
 ---
 
