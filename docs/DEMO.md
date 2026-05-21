@@ -1,15 +1,25 @@
-# Recording a demo GIF (optional)
+# Demo media capture
 
-The README uses **PNG screenshots** so the repo stays lightweight. To add a GIF:
+Automated capture (Playwright + optional ffmpeg):
 
-1. Start the stack: `docker compose up --build` (or dev API + web).
-2. Open http://localhost:8080 and search **BRCA1**.
-3. Open the gene detail page — show the force-directed graph pan/zoom.
-4. Record 10–20 seconds with [ScreenToGif](https://www.screentogif.com/) or OBS.
-5. Save as `docs/demo-walkthrough.gif` and add to README:
+```bash
+docker compose up --build -d
+# wait until http://localhost:8080 loads
+node scripts/capture_media.mjs
+```
 
-   ```markdown
-   ![Demo walkthrough](docs/demo-walkthrough.gif)
-   ```
+Outputs:
 
-No application code changes are required.
+| File | Description |
+|------|-------------|
+| `screenshot-search.png` | Search results for BRCA1 |
+| `screenshot-graph.png` | Force-directed subgraph |
+| `screenshot-gene-detail.png` | Full gene detail page |
+| `demo-walkthrough.gif` | Short search → gene → graph animation (requires ffmpeg on PATH) |
+
+Environment:
+
+- `WEB_URL` — default `http://127.0.0.1:8080`
+- `GENE_PATH` — default `/gene/ENSG00000012048`
+
+Manual recording is still fine via [ScreenToGif](https://www.screentogif.com/) if ffmpeg is not installed.

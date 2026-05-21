@@ -37,6 +37,14 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 
 Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md).
 
+### Demo walkthrough
+
+![Demo walkthrough — search BRCA1 and open graph view](docs/demo-walkthrough.gif)
+
+### Human-in-the-loop
+
+Before trusting agent or MCP output, review associations in the web UI. See [docs/HUMAN_IN_THE_LOOP.md](docs/HUMAN_IN_THE_LOOP.md).
+
 ---
 
 ## Quick start
@@ -100,6 +108,8 @@ docker compose -f docker-compose.yml -f docker-compose.mcp.yml up --build
 | Service | URL |
 |---------|-----|
 | MCP (SSE) | http://localhost:1337/sse |
+
+Human review workflow: [docs/HUMAN_IN_THE_LOOP.md](docs/HUMAN_IN_THE_LOOP.md).
 
 The `seed` service runs once per `compose up` (loads Open Targets–style sample data). To re-seed:
 
