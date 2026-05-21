@@ -22,6 +22,51 @@ class GeneDetail(GeneSummary):
     protein_count: int = 0
 
 
+class DiseaseDetail(DiseaseSummary):
+    gene_count: int = 0
+
+
+class ScoredGeneTarget(BaseModel):
+    gene_id: str
+    symbol: str
+    name: str | None = None
+    score: float
+
+
+class ScoredDiseaseAssociation(BaseModel):
+    disease_id: str
+    name: str
+    score: float
+
+
+class DiseaseGenesResponse(BaseModel):
+    disease_id: str
+    disease_name: str
+    min_score: float
+    genes: list[ScoredGeneTarget]
+
+
+class GeneDiseasesResponse(BaseModel):
+    gene_id: str
+    symbol: str
+    min_score: float
+    diseases: list[ScoredDiseaseAssociation]
+
+
+class GeneCompareSummary(BaseModel):
+    gene_id: str
+    symbol: str
+    name: str | None = None
+    disease_count: int = 0
+    top_diseases: list[ScoredDiseaseAssociation] = Field(default_factory=list)
+
+
+class CompareGenesResponse(BaseModel):
+    symbols: list[str]
+    genes: list[GeneCompareSummary]
+    overlapping_disease_names: list[str] = Field(default_factory=list)
+
+
 class NeighborNode(BaseModel):
     id: str
     label: str

@@ -149,7 +149,11 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | `GET` | `/genes?q=` | Search genes by symbol or name |
 | `GET` | `/diseases?q=` | Search diseases |
 | `GET` | `/genes/{id}` | Gene metadata + degree counts |
+| `GET` | `/genes/{id}/diseases` | Diseases for a gene, ranked by `score` (`min_score`, `limit`) |
 | `GET` | `/genes/{id}/neighbors` | 1-hop subgraph (JSON nodes + edges) |
+| `GET` | `/genes/compare?symbols=` | Compare 2–5 genes; top diseases + overlap |
+| `GET` | `/diseases/{id}` | Disease metadata + linked gene count |
+| `GET` | `/diseases/{id}/genes` | Gene targets for a disease, ranked by `score` |
 | `GET` | `/export/subgraph?gene_id=` | Subgraph for force-directed visualization |
 
 ---

@@ -1,7 +1,17 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from app.db import get_session
-from app.models.schemas import GeneDetail, GeneSummary, NeighborEdge, NeighborNode, NeighborsResponse
+from app.models.schemas import (
+    CompareGenesResponse,
+    GeneCompareSummary,
+    GeneDetail,
+    GeneDiseasesResponse,
+    GeneSummary,
+    NeighborEdge,
+    NeighborNode,
+    NeighborsResponse,
+    ScoredDiseaseAssociation,
+)
 
 router = APIRouter(prefix="/genes", tags=["genes"])
 
@@ -21,6 +31,126 @@ def search_genes(q: str = Query("", min_length=0)) -> list[GeneSummary]:
             q=q,
         )
         return [GeneSummary(id=r["id"], symbol=r["symbol"], name=r["name"]) for r in result]
+
+
+@router.get("/compare", response_model=CompareGenesResponse)
+def compare_genes(
+    symbols: str = Query(..., description="Comma-separated gene symbols, e.g. BRCA1,TP53"),
+    top_n: int = Query(5, ge=1, le=25),
+) -> CompareGenesResponse:
+    symbol_list = [s.strip() for s in symbols.split(",") if s.strip()]
+    if len(symbol_list) < 2:
+        raise HTTPException(status_code=400, detail="Provide at least two symbols separated by commas")
+    if len(symbol_list) > 5:
+        raise HTTPException(status_code=400, detail="At most 5 symbols per comparison")
+
+    summaries: list[GeneCompareSummary] = []
+    disease_sets: list[set[str]] = []
+
+    with get_session() as session:
+        for symbol in symbol_list:
+            gene = session.run(
+                """
+                MATCH (g:Gene)
+                WHERE toLower(g.symbol) = toLower($symbol)
+                RETURN g.id AS id, g.symbol AS symbol, g.name AS name
+                LIMIT 1
+                """,
+                symbol=symbol,
+            ).single()
+            if not gene:
+                raise HTTPException(status_code=404, detail=f"Gene not found: {symbol}")
+
+            detail = session.run(
+                """
+                MATCH (g:Gene {id: $id})
+                OPTIONAL MATCH (g)-[:ASSOCIATED_WITH]->(d:Disease)
+                RETURN count(DISTINCT d) AS disease_count
+                """,
+                id=gene["id"],
+            ).single()
+
+            disease_rows = session.run(
+                """
+                MATCH (g:Gene {id: $id})-[r:ASSOCIATED_WITH]->(d:Disease)
+                RETURN d.id AS disease_id, d.name AS name, r.score AS score
+                ORDER BY r.score DESC
+                LIMIT $top_n
+                """,
+                id=gene["id"],
+                top_n=top_n,
+            )
+            top_diseases = [
+                ScoredDiseaseAssociation(
+                    disease_id=r["disease_id"],
+                    name=r["name"],
+                    score=float(r["score"]),
+                )
+                for r in disease_rows
+            ]
+            disease_sets.append({d.name for d in top_diseases})
+            summaries.append(
+                GeneCompareSummary(
+                    gene_id=gene["id"],
+                    symbol=gene["symbol"],
+                    name=gene["name"],
+                    disease_count=detail["disease_count"],
+                    top_diseases=top_diseases,
+                )
+            )
+
+    overlap: set[str] = disease_sets[0]
+    for ds in disease_sets[1:]:
+        overlap &= ds
+
+    return CompareGenesResponse(
+        symbols=symbol_list,
+        genes=summaries,
+        overlapping_disease_names=sorted(overlap),
+    )
+
+
+@router.get("/{gene_id}/diseases", response_model=GeneDiseasesResponse)
+def get_gene_diseases(
+    gene_id: str,
+    min_score: float = Query(0.0, ge=0.0, le=1.0),
+    limit: int = Query(25, ge=1, le=100),
+) -> GeneDiseasesResponse:
+    with get_session() as session:
+        gene = session.run(
+            "MATCH (g:Gene {id: $id}) RETURN g.id AS id, g.symbol AS symbol",
+            id=gene_id,
+        ).single()
+        if not gene:
+            raise HTTPException(status_code=404, detail="Gene not found")
+
+        rows = session.run(
+            """
+            MATCH (g:Gene {id: $id})-[r:ASSOCIATED_WITH]->(d:Disease)
+            WHERE r.score >= $min_score
+            RETURN d.id AS disease_id, d.name AS name, r.score AS score
+            ORDER BY r.score DESC
+            LIMIT $limit
+            """,
+            id=gene_id,
+            min_score=min_score,
+            limit=limit,
+        )
+        diseases = [
+            ScoredDiseaseAssociation(
+                disease_id=r["disease_id"],
+                name=r["name"],
+                score=float(r["score"]),
+            )
+            for r in rows
+        ]
+
+    return GeneDiseasesResponse(
+        gene_id=gene["id"],
+        symbol=gene["symbol"],
+        min_score=min_score,
+        diseases=diseases,
+    )
 
 
 @router.get("/{gene_id}", response_model=GeneDetail)
