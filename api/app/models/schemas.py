@@ -94,6 +94,24 @@ class StatsResponse(BaseModel):
     associations: int
 
 
+class DataSourceMeta(BaseModel):
+    name: str
+    url: str
+    license: str | None = None
+
+
+class MetaResponse(BaseModel):
+    service: str
+    api_version: str
+    data_version: str
+    release_date: str
+    sources: list[DataSourceMeta]
+    disclaimer: str
+    associations_are_correlative: bool = True
+    provenance_doc: str = "PROVENANCE.md"
+    web_ui_gene_path: str = "/gene/{gene_id}"
+
+
 class SubgraphNode(BaseModel):
     id: str
     label: str

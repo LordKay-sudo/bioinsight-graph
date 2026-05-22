@@ -43,6 +43,15 @@ export interface StatsResponse {
   associations: number;
 }
 
+export interface MetaResponse {
+  service: string;
+  api_version: string;
+  data_version: string;
+  release_date: string;
+  disclaimer: string;
+  associations_are_correlative: boolean;
+}
+
 export interface SubgraphNode {
   id: string;
   label: string;
@@ -86,4 +95,5 @@ export const api = {
       `/api/v1/export/subgraph?gene_id=${encodeURIComponent(geneId)}`
     ),
   health: () => fetchJson<{ status: string; neo4j: boolean }>("/api/v1/health"),
+  getMeta: () => fetchJson<MetaResponse>("/api/v1/meta"),
 };

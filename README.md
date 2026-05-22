@@ -35,7 +35,7 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 |--------|----------------------|-------------|
 | ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
 
-Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md).
+Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md) · Improvement roadmap: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md).
 
 ### Demo walkthrough
 
@@ -210,6 +210,7 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/health` | Liveness + Neo4j connectivity |
+| `GET` | `/meta` | Data version, sources, disclaimer ([PROVENANCE.md](PROVENANCE.md)) |
 | `GET` | `/stats` | Node and relationship counts |
 | `GET` | `/genes?q=` | Search genes by symbol or name |
 | `GET` | `/diseases?q=` | Search diseases |

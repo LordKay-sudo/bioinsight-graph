@@ -1,6 +1,14 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
+import { api, type MetaResponse } from "../api/client";
+
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const [meta, setMeta] = useState<MetaResponse | null>(null);
+
+  useEffect(() => {
+    api.getMeta().then(setMeta).catch(() => setMeta(null));
+  }, []);
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -23,7 +31,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="app-main">{children}</main>
       <footer className="app-footer">
         <p>
-          Data: Open Targets–style sample · API docs:{" "}
+          {meta ? (
+            <>
+              Data: <code>{meta.data_version}</code> ({meta.release_date}) · associations are
+              correlative, not causal ·{" "}
+            </>
+          ) : (
+            <>Data: Open Targets–style sample · </>
+          )}
+          <a
+            href="https://github.com/LordKay-sudo/bioinsight-graph/blob/main/PROVENANCE.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Provenance
+          </a>
+          {" · "}
+          API:{" "}
           <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">
             OpenAPI
           </a>

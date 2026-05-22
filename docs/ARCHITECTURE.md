@@ -1,6 +1,6 @@
 # BioInsight Graph — architecture reference
 
-This document supplements the [README](../README.md). The **application code is unchanged** here — only diagrams and URLs for demos.
+This document supplements the [README](../README.md). The **application code is unchanged** here — only diagrams and URLs for demos. Cross-repo improvement plan: [PORTFOLIO_ROADMAP.md](./PORTFOLIO_ROADMAP.md).
 
 ## System context
 
