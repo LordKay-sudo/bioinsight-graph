@@ -47,11 +47,21 @@ GraphRAG improved naive RAG; production biodata agents still need **reasoning-sh
 | Theme | In this ecosystem (not a PRoH fork) |
 |-------|--------------------------------------|
 | Higher-order facts | **Evidence bundles** on associations (type, source, score) — “hyperedge-like” without a hypergraph DB |
+| **Ontology-guided structure** | Typed entities/relations + EFO/MONDO/ENSG — curated ingest on BioInsight; schema-guided extract on kg-rag ([UniAI-GraphRAG](https://arxiv.org/html/2603.25152v3), production ontology posts) |
 | Dynamic planning | MCP **plan → execute → replan**; conditional graph before literature |
+| **Dual-channel retrieval** | Local graph hops (API/dossier) + cited document chunks (kg-rag) — not full MS GraphRAG community reports on a tiny graph |
 | Provenance | `/meta`, dossier footers, export bundles, HITL vs UI |
 | Honest limits | Association ≠ causation; demo data disclaimers |
 
-Reference architecture only: [PRoH (WWW 2026)](https://github.com/zaixjun/PRoH). Implement via [ROADMAP](./ROADMAP.md) task IDs, not by importing that codebase.
+Reference architectures only — implement via [ROADMAP](./ROADMAP.md) task IDs: [PRoH](https://github.com/zaixjun/PRoH), [UniAI-GraphRAG](https://arxiv.org/abs/2603.25152). Do **not** import those codebases or replace Open Targets ingest with schema-free LLM graph building.
+
+### Ontology-first vs LLM-built (main graph)
+
+| Approach | Use in this portfolio |
+|----------|------------------------|
+| **Curated public data + ontology IDs** | **BioInsight** — source of truth for target–disease evidence |
+| **LLM extract → normalize → Neo4j** | **kg-rag-demo** only — literature demo ([ML6 biomedical KG](https://blog.ml6.eu/accelerating-biomedical-knowledge-graph-construction-with-llms-db429952f4b2)) |
+| **LangChain GraphRAG tutorial stack** | Optional reading ([Towards AI + Neo4j](https://pub.towardsai.net/graphrag-explained-building-knowledge-grounded-llm-systems-with-neo4j-and-langchain-017a1820763e)); not a required dependency |
 
 ---
 
@@ -135,6 +145,8 @@ Do **not** remove force-directed views or search UX. Add:
 | Same **ENSG / EFO** resolution as BioInsight | One platform story |
 | Document + notebook: structured graph + RAG for one gene | Multimodal evidence demo |
 | Extraction provenance (chunk id, confidence) | Transparent pipeline |
+| **`docs/EXTRACTION_SCHEMA.md`** — allowed entity/relation types (ontology-guided extract) | Less noisy triples than open IE |
+| **Normalization step** after extract (synonyms, duplicates) | ML6 uniformisation pattern |
 
 ---
 
@@ -145,6 +157,7 @@ Do **not** remove force-directed views or search UX. Add:
 | Tools return `data_version` and canonical URLs | Provenance in agent workflows |
 | `resolve_identifier`, `get_target_evidence` | Beyond thin JSON proxy |
 | `export_provenance_bundle` | Auditable export bundle (sources, versions, links) |
+| **`graph-and-literature` as dual-channel** — dossier first; kg-rag only if needed | UniAI-style local + document fusion |
 | Prompt: step-by-step “public data → local API → MCP” | Runnable without reading Java internals |
 | HITL remains default-off for MCP; UI is ground truth | Sensible production split |
 

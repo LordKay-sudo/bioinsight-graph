@@ -25,19 +25,25 @@
 
 ---
 
-## Strategic direction (PRoH / GraphRAG lesson)
+## Strategic direction
 
-GraphRAG ≠ enough. Target: **decomposed evidence on graph edges** + **planned/adaptive MCP retrieval** + **conditional graph→literature** — not rebranding as “hypergraph RAG.”
+GraphRAG ≠ enough (PRoH: planned multi-hop). Production biodata also needs **ontology-guided** structure (schema-constrained types/IDs — not schema-free LLM triple mining on the main graph).
+
+| Layer | Approach |
+|-------|----------|
+| **BioInsight** | Curated ingest (Open Targets–style) + ENSG/EFO/MONDO + evidence on edges |
+| **kg-rag** | Ontology-guided extract → **normalize** → cite (ML6-style); does not replace BioInsight |
+| **embabel** | **Dual-channel**: channel A = graph dossier/API; channel B = kg-rag chunks only when needed (M8) |
 
 ---
 
 ## Priority next (all repos)
 
-1. **BioInsight 1.x** — real OT-style bulk ingest, evidence on relationships, API breakdown  
-2. **BioInsight 2.x** — ENSG/EFO, external-links  
-3. **BioInsight 3.x** — evidence UI, disease page, compare UI, export  
-4. **embabel M1–M6** — plan/route prompts, meta in dossiers, then `resolve_identifier` / `get_target_evidence` when API ready  
-5. **kg-rag R1–R4** — PMIDs/DOIs, citation blocks; then R5–R8 shared IDs + notebook  
+1. **BioInsight 1.x** — bulk ingest, evidence on relationships, API breakdown  
+2. **BioInsight 2.x** — ENSG/EFO, `docs/ONTOLOGY_SCHEMA.md`, external-links  
+3. **BioInsight 3.x** — evidence UI, disease page, compare, export  
+4. **embabel M1–M6, M8** — plan/route; dual-channel graph→literature  
+5. **kg-rag R1–R4** — citations; **R16–R17** extraction schema + normalization; **R5–R8** shared IDs  
 
 ---
 
@@ -52,7 +58,11 @@ GraphRAG ≠ enough. Target: **decomposed evidence on graph edges** + **planned/
 
 ## Non-goals
 
-Clinical advice; causal claims from scores; replacing Ensembl/OT Platform; PRoH codebase import; unbounded external API MCP wrappers.
+Clinical advice; causal claims from scores; replacing Ensembl/OT Platform; PRoH/UniAI codebase import; LLM-built target–disease graph replacing OT ingest; LangChain/MS GraphRAG community pipeline as core architecture.
+
+## Reading (optional)
+
+Ontology GraphRAG: [Akash Medium](https://medium.com/@aiwithakashgoyal/beyond-simple-extraction-how-production-grade-ontologies-transform-graphrag-from-prototype-to-333742fa41a6) · [UniAI-GraphRAG arXiv:2603.25152](https://arxiv.org/html/2603.25152v3) · Biomedical LLM KG: [ML6 blog](https://blog.ml6.eu/accelerating-biomedical-knowledge-graph-construction-with-llms-db429952f4b2)
 
 ---
 
@@ -74,4 +84,4 @@ kg-rag-demo/docs/ROADMAP.md               # R1–R15
 
 ---
 
-*Last updated: 2026-05 — refresh when phases ship.*
+*Last updated: 2026-05-21 — refresh when phases ship.*

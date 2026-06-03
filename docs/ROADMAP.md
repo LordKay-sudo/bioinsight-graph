@@ -12,7 +12,17 @@ No code in this doc — use task IDs when opening issues or PRs.
 
 Disease–target **knowledge graph** (Neo4j + FastAPI + React). Credibility = public data + stable IDs + **evidence on edges** + provenance — not “hypergraph RAG” branding. GraphRAG-style structure is the base; next step is **decomposed evidence** and APIs that support **planned multi-hop retrieval** (MCP/agents consume this).
 
-Inspired by (do not reimplement): [PRoH](https://github.com/zaixjun/PRoH) — dynamic planning over rich structure; here = evidence bundles on associations + clear API hops.
+Inspired by (do not reimplement): [PRoH](https://github.com/zaixjun/PRoH) — dynamic planning; [UniAI-GraphRAG](https://arxiv.org/html/2603.25152v3) — ontology-guided structure + dual-channel retrieval. Here = **curated ontology-backed graph** + evidence bundles + API hops.
+
+### Ontology-first main graph (vs LLM-built)
+
+BioInsight’s target–disease graph comes from **bulk public ingest**, not schema-free LLM triple extraction. Ontology = industry IDs + typed relations + evidence constraints — not a separate hypergraph product.
+
+| Do | Don’t |
+|----|--------|
+| Open Targets–style ETL with evidence fields | Replace ingest with PubMed LLM extraction at scale |
+| ENSG / EFO / MONDO validation on load | LangChain GraphRAG community pipeline as core architecture |
+| Document schema in `docs/ONTOLOGY_SCHEMA.md` | Claim “production GraphRAG” without citable data underneath |
 
 ---
 
@@ -43,6 +53,7 @@ Inspired by (do not reimplement): [PRoH](https://github.com/zaixjun/PRoH) — dy
 
 | ID | Task | Done when |
 |----|------|-----------|
+| **2.0** | `docs/ONTOLOGY_SCHEMA.md` — entity types, relation types, ID rules (S=(E,R,Φ) style) | Matches Neo4j model + API |
 | **2.1** | Ingest: Ensembl **ENSG** + EFO/MONDO on diseases | Validation on load |
 | **2.2** | `GET /genes/{id}/external-links` (Ensembl, Open Targets, UniProt) | All demo genes resolve |
 | **2.3** | UI: “Open in Ensembl / Open Targets” on gene page | Links live |
@@ -86,6 +97,14 @@ Inspired by (do not reimplement): [PRoH](https://github.com/zaixjun/PRoH) — dy
 - Causal claims from association scores alone
 - Ingest via thousands of per-entity HTTP calls (use bulk)
 - Embedding a PRoH-style hypergraph RAG engine in this repo
+- LLM-primary graph for target–disease associations (use kg-rag for text-derived facts only)
+
+## References (optional reading)
+
+- [Towards AI — Neo4j + LangChain GraphRAG](https://pub.towardsai.net/graphrag-explained-building-knowledge-grounded-llm-systems-with-neo4j-and-langchain-017a1820763e) — stack patterns only  
+- [ML6 — biomedical KG with LLMs](https://blog.ml6.eu/accelerating-biomedical-knowledge-graph-construction-with-llms-db429952f4b2) — applies to **kg-rag**, not main ingest  
+- [Production ontologies for GraphRAG (Medium)](https://medium.com/@aiwithakashgoyal/beyond-simple-extraction-how-production-grade-ontologies-transform-graphrag-from-prototype-to-333742fa41a6)  
+- [DeepSense — ontology-driven GraphRAG](https://deepsense.ai/resource/ontology-driven-knowledge-graph-for-graphrag/)
 
 ---
 
