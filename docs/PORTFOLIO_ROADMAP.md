@@ -4,6 +4,9 @@ Generic strengthening plan for the **BioInsight Graph** platform and related rep
 
 **Positioning:** A full-stack **disease–target knowledge graph** with API, UI, literature RAG, and optional MCP — built on public biomedical data standards, not a replacement for production genome browsers or target platforms.
 
+**Per-repo execution roadmaps:** [bioinsight ROADMAP](./ROADMAP.md) · [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp/blob/main/docs/ROADMAP.md) · [kg-rag-demo](https://github.com/LordKay-sudo/kg-rag-demo/blob/main/docs/ROADMAP.md)  
+**Compact session handoff:** [ECOSYSTEM_CONTEXT.md](./ECOSYSTEM_CONTEXT.md)
+
 ---
 
 ## Typical audiences
@@ -33,6 +36,22 @@ One roadmap covers all of the above — no per-organization variants required.
 | **Structured + unstructured** | Graph associations plus cited literature (two repos, one story) |
 | **Human-in-the-loop** | Review workflow before trusting agent output |
 | **Quick-start tutorials** | Notebook or walkthrough: download → graph → query in &lt; 15 minutes |
+| **Planned retrieval (not static RAG)** | Decompose questions; adapt tool/API hops; fuse graph + cited literature |
+
+---
+
+## Beyond GraphRAG (design direction)
+
+GraphRAG improved naive RAG; production biodata agents still need **reasoning-shaped retrieval**:
+
+| Theme | In this ecosystem (not a PRoH fork) |
+|-------|--------------------------------------|
+| Higher-order facts | **Evidence bundles** on associations (type, source, score) — “hyperedge-like” without a hypergraph DB |
+| Dynamic planning | MCP **plan → execute → replan**; conditional graph before literature |
+| Provenance | `/meta`, dossier footers, export bundles, HITL vs UI |
+| Honest limits | Association ≠ causation; demo data disclaimers |
+
+Reference architecture only: [PRoH (WWW 2026)](https://github.com/zaixjun/PRoH). Implement via [ROADMAP](./ROADMAP.md) task IDs, not by importing that codebase.
 
 ---
 
@@ -146,12 +165,12 @@ Sequential phases (~12 weeks). Adjust dates to your schedule; phases 4 and 5 can
 
 ### Phase 0 — Trust and provenance (week 1)
 
-| ID | Task | Repo |
-|----|------|------|
-| 0.1 | `PROVENANCE.md` — licences, citations, data version, disclaimers | bioinsight-graph |
-| 0.2 | `GET /meta` | bioinsight-graph |
-| 0.3 | UI: version + disclaimer on main pages | bioinsight-graph |
-| 0.4 | README section: associations vs causation | bioinsight-graph |
+| ID | Task | Repo | Status |
+|----|------|------|--------|
+| 0.1 | `PROVENANCE.md` — licences, citations, data version, disclaimers | bioinsight-graph | ✓ |
+| 0.2 | `GET /meta` | bioinsight-graph | ✓ |
+| 0.3 | UI: version + disclaimer on main pages | bioinsight-graph | ✓ |
+| 0.4 | README section: associations vs causation | bioinsight-graph | open |
 
 **Done when:** Every API consumer can read version + limits without reading code.
 
@@ -311,6 +330,8 @@ Pick what fits your ingest; document versions and licences in `PROVENANCE.md`.
 
 ## Related docs
 
+- [ROADMAP.md](./ROADMAP.md) — bioinsight task IDs (P0–P2)
+- [ECOSYSTEM_CONTEXT.md](./ECOSYSTEM_CONTEXT.md) — compact handoff for agents
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — diagrams and URLs
 - [HUMAN_IN_THE_LOOP.md](./HUMAN_IN_THE_LOOP.md) — review workflows
 - [DEMO.md](./DEMO.md) — screenshots and GIF capture

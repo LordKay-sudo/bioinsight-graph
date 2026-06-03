@@ -35,7 +35,7 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 |--------|----------------------|-------------|
 | ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
 
-Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md) · Improvement roadmap: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md).
+Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md) · Agent handoff: [docs/ECOSYSTEM_CONTEXT.md](docs/ECOSYSTEM_CONTEXT.md).
 
 ### Demo walkthrough
 
