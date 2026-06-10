@@ -15,4 +15,4 @@ COPY api/app /app/api/app
 COPY scripts /app/scripts
 COPY data /app/data
 
-CMD ["/bin/sh", "-c", "python /app/scripts/download_sample.py && python /app/scripts/etl_opentargets.py && python /app/scripts/seed_neo4j.py"]
+CMD ["/bin/sh", "-c", "python /app/scripts/etl_opentargets.py && python /app/scripts/seed_neo4j.py"]

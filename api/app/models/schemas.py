@@ -26,17 +26,43 @@ class DiseaseDetail(DiseaseSummary):
     gene_count: int = 0
 
 
+class EvidenceItem(BaseModel):
+    evidence_type: str
+    source: str
+    score: float = Field(ge=0.0, le=1.0)
+    study_id: str | None = None
+
+
 class ScoredGeneTarget(BaseModel):
     gene_id: str
     symbol: str
     name: str | None = None
     score: float
+    source: str | None = None
+    evidence: list[EvidenceItem] = Field(default_factory=list)
 
 
 class ScoredDiseaseAssociation(BaseModel):
     disease_id: str
     name: str
     score: float
+    source: str | None = None
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+
+
+class AssociationEvidenceBundle(BaseModel):
+    disease_id: str
+    disease_name: str
+    score: float
+    source: str
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+
+
+class GeneEvidenceResponse(BaseModel):
+    gene_id: str
+    symbol: str
+    disease_id: str | None = None
+    evidence: list[AssociationEvidenceBundle] = Field(default_factory=list)
 
 
 class DiseaseGenesResponse(BaseModel):

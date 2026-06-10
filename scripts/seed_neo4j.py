@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "api"))
 from app.config import settings  # noqa: E402
 
 INIT_CYPHER = (ROOT / "scripts" / "neo4j" / "init.cypher").read_text(encoding="utf-8")
+ASSOC_PATH = ROOT / "data" / "processed" / "associations.csv"
 
 
 def run_constraints(session) -> None:
@@ -23,9 +24,17 @@ def run_constraints(session) -> None:
             session.run(stmt)
 
 
+def _optional_str(value) -> str | None:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
 def seed(driver) -> None:
-    assoc = pd.read_csv(ROOT / "data" / "processed" / "associations.csv")
-    proteins = pd.read_csv(ROOT / "data" / "processed" / "proteins.csv")
+    assoc = pd.read_csv(ASSOC_PATH)
+    proteins_path = ROOT / "data" / "processed" / "proteins.csv"
+    proteins = pd.read_csv(proteins_path) if proteins_path.exists() else pd.DataFrame()
 
     with driver.session() as session:
         run_constraints(session)
@@ -53,16 +62,27 @@ def seed(driver) -> None:
             )
 
         for _, row in assoc.iterrows():
+            evidence_json = row.get("evidence_json", "[]")
+            if pd.isna(evidence_json):
+                evidence_json = "[]"
             session.run(
                 """
                 MATCH (g:Gene {id: $gene_id})
                 MATCH (d:Disease {id: $disease_id})
                 MERGE (g)-[r:ASSOCIATED_WITH]->(d)
-                SET r.score = $score, r.source = 'opentargets_sample'
+                SET r.score = $score,
+                    r.source = $source,
+                    r.evidence_type = $evidence_type,
+                    r.evidence_json = $evidence_json,
+                    r.study_id = $study_id
                 """,
                 gene_id=row["target_id"],
                 disease_id=row["disease_id"],
                 score=float(row["score"]),
+                source=row.get("source", "opentargets"),
+                evidence_type=row.get("evidence_type", "genetic_association"),
+                evidence_json=str(evidence_json),
+                study_id=_optional_str(row.get("study_id")),
             )
 
         for _, row in proteins.iterrows():

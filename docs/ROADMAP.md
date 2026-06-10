@@ -41,11 +41,11 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 
 | ID | Task | Done when |
 |----|------|-----------|
-| **1.1** | Document chosen Open Targets (or equivalent) **bulk** ingest source + licence in `PROVENANCE.md` | Source URL + version pinned |
-| **1.2** | Neo4j: `evidence_type`, `source`, `score` (and optional study ref) on `ASSOCIATED_WITH` | Schema migration documented |
-| **1.3** | ETL v2: defensible slice (≥500 genes, thousands of associations) | `/stats` reflects scale |
-| **1.4** | Ranked gene–disease endpoints return **evidence breakdown** per association | API tests + OpenAPI |
-| **1.5** | CI fixtures from frozen subset of ingest | Reproducible CI without full download |
+| ✓ **1.1** | Document chosen Open Targets (or equivalent) **bulk** ingest source + licence in `PROVENANCE.md` | Source URL + version pinned |
+| ✓ **1.2** | Neo4j: `evidence_type`, `source`, `score` (and optional study ref) on `ASSOCIATED_WITH` | Schema migration documented |
+| ✓ **1.3** | ETL v2: defensible slice (≥500 genes, thousands of associations) | `/stats` reflects scale |
+| ✓ **1.4** | Ranked gene–disease endpoints return **evidence breakdown** per association | API tests + OpenAPI |
+| ✓ **1.5** | CI fixtures from frozen subset of ingest | Reproducible CI without full download |
 
 ---
 
