@@ -72,6 +72,40 @@ export interface SubgraphResponse {
   links: SubgraphLink[];
 }
 
+export interface EvidenceItem {
+  evidence_type: string;
+  source: string;
+  score: number;
+  study_id?: string | null;
+}
+
+export interface AssociationEvidenceBundle {
+  disease_id: string;
+  disease_name: string;
+  score: number;
+  source: string;
+  evidence: EvidenceItem[];
+}
+
+export interface GeneEvidenceResponse {
+  gene_id: string;
+  symbol: string;
+  disease_id?: string | null;
+  evidence: AssociationEvidenceBundle[];
+}
+
+export interface ExternalLink {
+  label: string;
+  provider: string;
+  url: string;
+}
+
+export interface GeneExternalLinksResponse {
+  gene_id: string;
+  symbol: string;
+  links: ExternalLink[];
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`);
   if (!res.ok) {
@@ -96,4 +130,12 @@ export const api = {
     ),
   health: () => fetchJson<{ status: string; neo4j: boolean }>("/api/v1/health"),
   getMeta: () => fetchJson<MetaResponse>("/api/v1/meta"),
+  getGeneEvidence: (id: string, limit = 15) =>
+    fetchJson<GeneEvidenceResponse>(
+      `/api/v1/genes/${encodeURIComponent(id)}/evidence?limit=${limit}`
+    ),
+  getGeneExternalLinks: (id: string) =>
+    fetchJson<GeneExternalLinksResponse>(
+      `/api/v1/genes/${encodeURIComponent(id)}/external-links`
+    ),
 };

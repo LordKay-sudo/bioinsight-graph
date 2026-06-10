@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import EvidenceChart from "../components/EvidenceChart";
 import ForceGraphView from "../components/ForceGraphView";
 import {
   api,
+  type EvidenceItem,
   type GeneDetail as GeneDetailType,
+  type GeneExternalLinksResponse,
   type NeighborEdge,
   type NeighborNode,
   type SubgraphLink,
@@ -52,6 +55,8 @@ export default function GeneDetail() {
   const [subgraph, setSubgraph] = useState<{ nodes: SubgraphNode[]; links: SubgraphLink[] } | null>(
     null
   );
+  const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
+  const [externalLinks, setExternalLinks] = useState<GeneExternalLinksResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,12 +78,23 @@ export default function GeneDetail() {
       if (!cancelled && applyDemo()) setLoading(false);
     }, 1200);
 
-    Promise.all([api.getGene(geneId), api.getNeighbors(geneId), api.getSubgraph(geneId)])
-      .then(([g, n, sg]) => {
+    Promise.all([
+      api.getGene(geneId),
+      api.getNeighbors(geneId),
+      api.getSubgraph(geneId),
+      api.getGeneEvidence(geneId).catch(() => null),
+      api.getGeneExternalLinks(geneId).catch(() => null),
+    ])
+      .then(([g, n, sg, ev, links]) => {
         if (cancelled) return;
         setGene(g);
         setNeighbors({ nodes: n.nodes, edges: n.edges });
         setSubgraph({ nodes: sg.nodes, links: sg.links });
+        if (ev) {
+          const flat = ev.evidence.flatMap((b) => b.evidence);
+          setEvidenceItems(flat);
+        }
+        if (links) setExternalLinks(links);
       })
       .catch(() => {
         if (cancelled) return;
@@ -130,6 +146,22 @@ export default function GeneDetail() {
           {gene.id}
         </p>
 
+        {externalLinks && externalLinks.links.length > 0 && (
+          <div className="external-links">
+            {externalLinks.links.map((link) => (
+              <a
+                key={link.provider + link.url}
+                href={link.url}
+                target="_blank"
+                rel="noreferrer"
+                className="external-link-chip"
+              >
+                Open in {link.label}
+              </a>
+            ))}
+          </div>
+        )}
+
         <div className="detail-meta">
           <div className="meta-chip">
             <strong>{gene.disease_count}</strong>
@@ -145,6 +177,8 @@ export default function GeneDetail() {
           </div>
         </div>
       </div>
+
+      <EvidenceChart items={evidenceItems} />
 
       <div className="view-tabs">
         <button

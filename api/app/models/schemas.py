@@ -156,3 +156,15 @@ class SubgraphResponse(BaseModel):
     gene_id: str
     nodes: list[SubgraphNode]
     links: list[SubgraphLink]
+
+
+class ExternalLink(BaseModel):
+    label: str
+    provider: str
+    url: str
+
+
+class GeneExternalLinksResponse(BaseModel):
+    gene_id: str
+    symbol: str
+    links: list[ExternalLink] = Field(default_factory=list)
