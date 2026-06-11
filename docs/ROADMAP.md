@@ -62,7 +62,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ✓ **3.3** | UI: compare genes (wire compare API) | Side-by-side diseases |
 | ✓ **3.4** | `POST /genes/batch-lookup` | Batch in OpenAPI |
 | ✓ **3.5** | `GET /export/gene-report` (TSV/JSON + provenance columns) | Download works |
-| **3.6** | Refresh README screenshots/GIF | ✓ `scripts/capture_media.mjs` (+ disease/compare captures) |
+| ✓ **3.6** | Refresh README screenshots/GIF | `scripts/capture_media.mjs` (search, graph, compare, disease, GIF) |
 
 ---
 

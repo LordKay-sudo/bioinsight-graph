@@ -3,6 +3,7 @@
  * Requires BioInsight web on WEB_URL (default http://127.0.0.1:8080).
  *
  * Usage: node scripts/capture_media.mjs
+ * Also captures compare + disease pages (roadmap 3.6).
  */
 import { createRequire } from "module";
 import { mkdir, writeFile } from "fs/promises";
@@ -52,6 +53,30 @@ if (await graphPanel.count()) {
 }
 
 await page.screenshot({ path: path.join(docsDir, "screenshot-gene-detail.png"), fullPage: true });
+
+console.log("Capturing compare page...");
+await page.goto(`${baseUrl}/compare`);
+await page.waitForTimeout(1200);
+await page.screenshot({ path: path.join(docsDir, "screenshot-compare.png"), fullPage: true });
+
+console.log("Capturing disease page...");
+await page.goto(`${baseUrl}/`);
+await page.waitForTimeout(400);
+const diseasesTab = page.getByRole("button", { name: /Diseases/i });
+if (await diseasesTab.count()) {
+  await diseasesTab.click();
+}
+const diseaseSearch = page.getByPlaceholder(/breast|disease|search/i).first();
+if (await diseaseSearch.count()) {
+  await diseaseSearch.fill("breast");
+  await page.waitForTimeout(1500);
+  const diseaseLink = page.locator(".result-link").first();
+  if (await diseaseLink.count()) {
+    await diseaseLink.click();
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(docsDir, "screenshot-disease.png"), fullPage: true });
+  }
+}
 
 console.log("Capturing GIF frames...");
 const framesDir = path.join(docsDir, "_gif_frames");

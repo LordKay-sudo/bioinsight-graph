@@ -33,7 +33,14 @@ neo4j  (healthy)
 docker compose up --build        # full stack
 # UI:   http://localhost:8080
 # API:  http://localhost:8000/docs
-# Neo4j browser: http://localhost:7474  (neo4j / changeme)
+# Neo4j Browser: http://localhost:7474
+```
+
+If port **8000** is already in use on your machine, copy the override example and remap the API:
+
+```bash
+cp docker-compose.override.example.yml docker-compose.override.yml
+docker compose up --build   # API on :8001, UI still on :8080
 ```
 
 ## Local (no Docker)

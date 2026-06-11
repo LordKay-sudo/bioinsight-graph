@@ -50,14 +50,15 @@ The harness reports p50/p95/p99 per endpoint for `search`, `gene_detail`,
 
 | Endpoint | p50 (ms) | p95 (ms) | p99 (ms) |
 |----------|---------:|---------:|---------:|
-| `search_genes` | — | — | — |
-| `gene_detail` | — | — | — |
-| `gene_diseases` | — | — | — |
-| `gene_evidence` | — | — | — |
-| `stats` | — | — | — |
+| `search_genes` | 13.2 | 26.9 | 35.3 |
+| `gene_detail` | 10.3 | 21.4 | 28.9 |
+| `gene_diseases` | 13.3 | 31.8 | 42.7 |
+| `gene_evidence` | 12.5 | 22.7 | 32.1 |
+| `stats` | 8.3 | 27.8 | 36.3 |
 
-> Fill in after a local run. The frozen slice is small enough that latency is dominated
-> by Neo4j round-trip + serialization rather than query complexity.
+Measured on **Windows 10**, Docker Compose stack, frozen slice v2, `benchmark_api.py --iterations 200` against `http://localhost:8001` (2026-06-11).
+
+The frozen slice is small enough that latency is dominated by Neo4j round-trip + serialization rather than query complexity.
 
 ## Scaling note
 

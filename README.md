@@ -33,9 +33,9 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 
 ### UI gallery
 
-| Search | Force-directed graph | Gene detail |
-|--------|----------------------|-------------|
-| ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
+| Search | Force-directed graph | Gene detail | Compare | Disease |
+|--------|----------------------|-------------|---------|---------|
+| ![Search](docs/screenshot-search.png) | ![Graph](docs/screenshot-graph.png) | [Detail](docs/screenshot-gene-detail.png) | ![Compare](docs/screenshot-compare.png) | ![Disease](docs/screenshot-disease.png) |
 
 Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). Docs: [GETTING_STARTED.md](docs/GETTING_STARTED.md) · [Notebook (4.4)](notebooks/one_gene_exploration.ipynb) · [PLATFORM.md](docs/PLATFORM.md) · [BENCHMARKS.md](docs/BENCHMARKS.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md)
 
