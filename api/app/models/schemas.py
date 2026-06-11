@@ -168,3 +168,20 @@ class GeneExternalLinksResponse(BaseModel):
     gene_id: str
     symbol: str
     links: list[ExternalLink] = Field(default_factory=list)
+
+
+class BatchLookupRequest(BaseModel):
+    queries: list[str] = Field(..., min_length=1, max_length=100)
+
+
+class BatchLookupHit(BaseModel):
+    query: str
+    gene_id: str
+    symbol: str
+    name: str | None = None
+    disease_count: int = 0
+
+
+class BatchLookupResponse(BaseModel):
+    hits: list[BatchLookupHit] = Field(default_factory=list)
+    unresolved: list[str] = Field(default_factory=list)

@@ -11,6 +11,12 @@ from app.models.schemas import (
 
     AssociationEvidenceBundle,
 
+    BatchLookupHit,
+
+    BatchLookupRequest,
+
+    BatchLookupResponse,
+
     CompareGenesResponse,
 
     GeneCompareSummary,
@@ -412,6 +418,47 @@ def get_gene_evidence(
         evidence=bundles,
 
     )
+
+
+@router.post("/batch-lookup", response_model=BatchLookupResponse)
+def batch_lookup(payload: BatchLookupRequest) -> BatchLookupResponse:
+    hits: list[BatchLookupHit] = []
+    unresolved: list[str] = []
+    seen_queries: set[str] = set()
+
+    with get_session() as session:
+        for raw in payload.queries:
+            query = raw.strip()
+            if not query or query.lower() in seen_queries:
+                continue
+            seen_queries.add(query.lower())
+
+            row = session.run(
+                """
+                MATCH (g:Gene)
+                WHERE g.id = $q OR toLower(g.symbol) = toLower($q)
+                OPTIONAL MATCH (g)-[:ASSOCIATED_WITH]->(d:Disease)
+                RETURN g.id AS id, g.symbol AS symbol, g.name AS name,
+                       count(DISTINCT d) AS disease_count
+                LIMIT 1
+                """,
+                q=query,
+            ).single()
+
+            if row:
+                hits.append(
+                    BatchLookupHit(
+                        query=query,
+                        gene_id=row["id"],
+                        symbol=row["symbol"],
+                        name=row["name"],
+                        disease_count=row["disease_count"],
+                    )
+                )
+            else:
+                unresolved.append(query)
+
+    return BatchLookupResponse(hits=hits, unresolved=unresolved)
 
 
 @router.get("/{gene_id}/external-links", response_model=GeneExternalLinksResponse)

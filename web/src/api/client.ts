@@ -52,6 +52,48 @@ export interface MetaResponse {
   associations_are_correlative: boolean;
 }
 
+export interface DiseaseDetail extends DiseaseSummary {
+  gene_count: number;
+}
+
+export interface ScoredGeneTarget {
+  gene_id: string;
+  symbol: string;
+  name?: string | null;
+  score: number;
+  source?: string | null;
+  evidence: EvidenceItem[];
+}
+
+export interface DiseaseGenesResponse {
+  disease_id: string;
+  disease_name: string;
+  min_score: number;
+  genes: ScoredGeneTarget[];
+}
+
+export interface ScoredDiseaseAssociation {
+  disease_id: string;
+  name: string;
+  score: number;
+  source?: string | null;
+  evidence: EvidenceItem[];
+}
+
+export interface GeneCompareSummary {
+  gene_id: string;
+  symbol: string;
+  name?: string | null;
+  disease_count: number;
+  top_diseases: ScoredDiseaseAssociation[];
+}
+
+export interface CompareGenesResponse {
+  symbols: string[];
+  genes: GeneCompareSummary[];
+  overlapping_disease_names: string[];
+}
+
 export interface SubgraphNode {
   id: string;
   label: string;
@@ -138,4 +180,16 @@ export const api = {
     fetchJson<GeneExternalLinksResponse>(
       `/api/v1/genes/${encodeURIComponent(id)}/external-links`
     ),
+  getDisease: (id: string) =>
+    fetchJson<DiseaseDetail>(`/api/v1/diseases/${encodeURIComponent(id)}`),
+  getDiseaseGenes: (id: string, minScore = 0, limit = 25) =>
+    fetchJson<DiseaseGenesResponse>(
+      `/api/v1/diseases/${encodeURIComponent(id)}/genes?min_score=${minScore}&limit=${limit}`
+    ),
+  compareGenes: (symbols: string[], topN = 5) =>
+    fetchJson<CompareGenesResponse>(
+      `/api/v1/genes/compare?symbols=${encodeURIComponent(symbols.join(","))}&top_n=${topN}`
+    ),
+  geneReportUrl: (id: string, format: "json" | "tsv" = "tsv") =>
+    `${API_BASE}/api/v1/export/gene-report?gene_id=${encodeURIComponent(id)}&format=${format}`,
 };

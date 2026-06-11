@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import About from "./pages/About";
+import Compare from "./pages/Compare";
+import DiseaseDetail from "./pages/DiseaseDetail";
 import GeneDetail from "./pages/GeneDetail";
 import Search from "./pages/Search";
 
@@ -10,6 +12,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Search />} />
         <Route path="/gene/:geneId" element={<GeneDetail />} />
+        <Route path="/disease/:diseaseId" element={<DiseaseDetail />} />
+        <Route path="/compare" element={<Compare />} />
         <Route path="/about" element={<About />} />
       </Routes>
     </Layout>

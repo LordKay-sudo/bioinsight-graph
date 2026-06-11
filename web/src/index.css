@@ -507,3 +507,62 @@ tr:last-child td {
   font-size: 0.8rem;
   text-align: right;
 }
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.filter-row input[type="range"] {
+  flex: 1;
+  max-width: 320px;
+}
+
+.compare-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.compare-form .search-input {
+  flex: 1;
+}
+
+.overlap-box {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--accent-dim);
+  background: rgba(56, 189, 248, 0.08);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.compare-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 1rem;
+}
+
+.compare-card h3 {
+  margin: 0 0 0.25rem;
+}
+
+.compare-card table {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.shared-row {
+  background: rgba(56, 189, 248, 0.1);
+}

@@ -149,11 +149,11 @@ export default function Search() {
                 ))
               : diseases.map((d) => (
                   <li key={d.id} className="result-item">
-                    <div className="result-link">
+                    <Link to={`/disease/${encodeURIComponent(d.id)}`} className="result-link">
                       <span className="badge badge-disease">Disease</span>{" "}
                       <span className="result-symbol">{d.name}</span>
                       <div className="result-name mono">{d.id}</div>
-                    </div>
+                    </Link>
                   </li>
                 ))}
           </ul>

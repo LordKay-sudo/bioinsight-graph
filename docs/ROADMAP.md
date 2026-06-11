@@ -58,10 +58,10 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ✓ **2.2** | `GET /genes/{id}/external-links` (Ensembl, Open Targets, UniProt) | All demo genes resolve |
 | ✓ **2.3** | UI: “Open in Ensembl / Open Targets” on gene page | Links live |
 | ✓ **3.1** | UI: evidence chart (by type) on gene detail | Matches API breakdown |
-| **3.2** | UI: disease page → top targets | Disease-centric workflow |
-| **3.3** | UI: compare genes (wire compare API) | Side-by-side diseases |
-| **3.4** | `POST /genes/batch-lookup` | Batch in OpenAPI |
-| **3.5** | `GET /export/gene-report` (TSV/JSON + provenance columns) | Download works |
+| ✓ **3.2** | UI: disease page → top targets | Disease-centric workflow |
+| ✓ **3.3** | UI: compare genes (wire compare API) | Side-by-side diseases |
+| ✓ **3.4** | `POST /genes/batch-lookup` | Batch in OpenAPI |
+| ✓ **3.5** | `GET /export/gene-report` (TSV/JSON + provenance columns) | Download works |
 | **3.6** | Refresh README screenshots/GIF | Visuals match features |
 
 ---

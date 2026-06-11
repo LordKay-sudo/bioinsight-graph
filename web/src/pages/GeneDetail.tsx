@@ -146,21 +146,26 @@ export default function GeneDetail() {
           {gene.id}
         </p>
 
-        {externalLinks && externalLinks.links.length > 0 && (
-          <div className="external-links">
-            {externalLinks.links.map((link) => (
-              <a
-                key={link.provider + link.url}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="external-link-chip"
-              >
-                Open in {link.label}
-              </a>
-            ))}
-          </div>
-        )}
+        <div className="external-links">
+          {externalLinks?.links.map((link) => (
+            <a
+              key={link.provider + link.url}
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              className="external-link-chip"
+            >
+              Open in {link.label}
+            </a>
+          ))}
+          <a
+            href={api.geneReportUrl(gene.id, "tsv")}
+            className="external-link-chip"
+            download
+          >
+            Download report (TSV)
+          </a>
+        </div>
 
         <div className="detail-meta">
           <div className="meta-chip">

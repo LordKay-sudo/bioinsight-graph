@@ -24,6 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavLink to="/" end>
               Search
             </NavLink>
+            <NavLink to="/compare">Compare</NavLink>
             <NavLink to="/about">About</NavLink>
           </nav>
         </div>
