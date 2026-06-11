@@ -26,7 +26,7 @@ await page.waitForTimeout(800);
 await page.screenshot({ path: path.join(docsDir, "screenshot-search.png"), fullPage: true });
 
 await page.goto(`${baseUrl}/gene/ENSG00000012048`);
-await page.waitForSelector(".graph-panel canvas", { timeout: 10000 });
+await page.waitForSelector(".graph-panel canvas", { timeout: 10000 }).catch(() => {});
 await page.waitForTimeout(1500);
 await page.locator(".graph-section").screenshot({
   path: path.join(docsDir, "screenshot-graph.png"),
@@ -35,6 +35,21 @@ await page.screenshot({
   path: path.join(docsDir, "screenshot-gene-detail.png"),
   fullPage: true,
 });
+
+await page.goto(`${baseUrl}/compare`);
+await page.waitForTimeout(800);
+await page.screenshot({ path: path.join(docsDir, "screenshot-compare.png"), fullPage: true });
+
+await page.goto(`${baseUrl}/`);
+await page.getByRole("button", { name: /Diseases/i }).click();
+await page.getByPlaceholder(/breast/i).fill("breast");
+await page.waitForTimeout(1200);
+const diseaseLink = page.locator(".result-link").first();
+if (await diseaseLink.count()) {
+  await diseaseLink.click();
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: path.join(docsDir, "screenshot-disease.png"), fullPage: true });
+}
 
 await browser.close();
 console.log("Screenshots saved to docs/");

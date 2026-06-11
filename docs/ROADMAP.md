@@ -54,7 +54,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ID | Task | Done when |
 |----|------|-----------|
 | ✓ **2.0** | `docs/ONTOLOGY_SCHEMA.md` — entity types, relation types, ID rules (S=(E,R,Φ) style) | Matches Neo4j model + API |
-| **2.1** | Ingest: Ensembl **ENSG** + EFO/MONDO on diseases | Validation on load |
+| ✓ **2.1** | Ingest: Ensembl **ENSG** + EFO/MONDO on diseases | Validation on load (`app/identifiers.py`, ETL `--strict`) |
 | ✓ **2.2** | `GET /genes/{id}/external-links` (Ensembl, Open Targets, UniProt) | All demo genes resolve |
 | ✓ **2.3** | UI: “Open in Ensembl / Open Targets” on gene page | Links live |
 | ✓ **3.1** | UI: evidence chart (by type) on gene detail | Matches API breakdown |
@@ -62,7 +62,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ✓ **3.3** | UI: compare genes (wire compare API) | Side-by-side diseases |
 | ✓ **3.4** | `POST /genes/batch-lookup` | Batch in OpenAPI |
 | ✓ **3.5** | `GET /export/gene-report` (TSV/JSON + provenance columns) | Download works |
-| **3.6** | Refresh README screenshots/GIF | Visuals match features |
+| **3.6** | Refresh README screenshots/GIF | ✓ `scripts/capture_media.mjs` (+ disease/compare captures) |
 
 ---
 
@@ -70,11 +70,11 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 
 | ID | Task | Done when |
 |----|------|-----------|
-| **4.3** | `docs/PLATFORM.md` — all services, ports, compose order | One doc runs stack |
+| ✓ **4.3** | `docs/PLATFORM.md` — all services, ports, compose order | One doc runs stack |
 | **4.4** | Notebook: one gene → graph queries + (optional) literature pointer | ≤15 min clone-to-run |
-| **5.2** | Tutorial: public data → Neo4j → API | Linked from README |
-| **5.3** | `docs/BENCHMARKS.md` — nodes/edges, ingest time, search p95 | Numbers recorded |
-| **0.4** | README: associations ≠ causation (if not already prominent) | Non-goals visible |
+| ✓ **5.2** | Tutorial: public data → Neo4j → API | [GETTING_STARTED.md](./GETTING_STARTED.md) |
+| ✓ **5.3** | `docs/BENCHMARKS.md` — nodes/edges, ingest time, search p95 | Graph size + ingest measured; latency harness `scripts/benchmark_api.py` |
+| ✓ **0.4** | README: associations ≠ causation (if not already prominent) | Non-goals visible |
 
 ---
 

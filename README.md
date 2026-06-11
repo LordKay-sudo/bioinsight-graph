@@ -18,14 +18,15 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 | Capability | Status |
 |------------|--------|
 | Neo4j via Docker + schema constraints | ✅ |
-| Open Targets–style seed pipeline | ✅ |
-| FastAPI search & neighbor endpoints | ✅ |
-| React search + gene detail UI | ✅ |
-| Force-directed graph view | ✅ |
+| Open Targets frozen slice (500 genes, 3k+ associations) | ✅ |
+| Evidence on associations + `/genes/{id}/evidence` | ✅ |
+| FastAPI search, compare, batch-lookup, gene-report export | ✅ |
+| React search, gene/disease detail, compare pages | ✅ |
+| Force-directed graph + evidence chart | ✅ |
 | Full Docker Compose stack | ✅ |
 | GitHub Actions CI | ✅ |
 
-**Data (MVP):** Representative sample inspired by [Open Targets](https://www.opentargets.org/) — 30+ genes, 12 diseases, 105 disease–target associations, 10 protein links. Suitable for demos; not clinical-grade.
+**Data:** Open Targets **24.06** frozen slice — **500** genes, **20** diseases, **3,005** associations with typed evidence metadata. Demo/research use only — **not clinical-grade**. See [PROVENANCE.md](PROVENANCE.md).
 
 ![BioInsight Graph search UI](docs/screenshot-search.png)
 
@@ -35,7 +36,7 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 |--------|----------------------|-------------|
 | ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
 
-Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). More diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Optional GIF: [docs/DEMO.md](docs/DEMO.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md) · Agent handoff: [docs/ECOSYSTEM_CONTEXT.md](docs/ECOSYSTEM_CONTEXT.md).
+Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). Docs: [GETTING_STARTED.md](docs/GETTING_STARTED.md) · [PLATFORM.md](docs/PLATFORM.md) · [BENCHMARKS.md](docs/BENCHMARKS.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md)
 
 ### Demo walkthrough
 
@@ -44,6 +45,12 @@ Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (d
 ### Human-in-the-loop
 
 Before trusting agent or MCP output, review associations in the web UI. See [docs/HUMAN_IN_THE_LOOP.md](docs/HUMAN_IN_THE_LOOP.md).
+
+### Non-goals
+
+- **Not for clinical diagnosis or treatment decisions**
+- Association scores are **correlative**, not causal — see `/api/v1/meta` disclaimer
+- Does not replace Ensembl, Open Targets Platform, or regulatory-grade evidence pipelines
 
 ---
 
@@ -220,6 +227,10 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | `GET` | `/genes/compare?symbols=` | Compare 2–5 genes; top diseases + overlap |
 | `GET` | `/diseases/{id}` | Disease metadata + linked gene count |
 | `GET` | `/diseases/{id}/genes` | Gene targets for a disease, ranked by `score` |
+| `GET` | `/genes/{id}/evidence` | Evidence breakdown per disease association |
+| `GET` | `/genes/{id}/external-links` | Ensembl, Open Targets, UniProt links |
+| `POST` | `/genes/batch-lookup` | Resolve many symbols/ids at once |
+| `GET` | `/export/gene-report?gene_id=` | Analyst export (JSON or TSV + provenance columns) |
 | `GET` | `/export/subgraph?gene_id=` | Subgraph for force-directed visualization |
 
 ---
@@ -229,7 +240,9 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | Route | Page |
 |-------|------|
 | `/` | Search genes and diseases (debounced, tabbed) |
-| `/gene/:id` | Gene detail — graph view + neighbor table |
+| `/gene/:id` | Gene detail — evidence chart, external links, graph + neighbors |
+| `/disease/:id` | Disease detail — ranked gene targets with score filter |
+| `/compare` | Compare 2–5 genes — overlapping diseases highlighted |
 | `/about` | Data provenance, schema, limitations |
 
 ![BRCA1 subgraph — force-directed 1-hop neighborhood](docs/screenshot-graph.png)

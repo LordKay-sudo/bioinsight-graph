@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "api"))
 
 from app.evidence import evidence_items_to_json  # noqa: E402
+from app.identifiers import validate_association  # noqa: E402
 DEFAULT_RAW = ROOT / "data" / "raw" / "opentargets_slice_v2.json"
 LEGACY_RAW = ROOT / "data" / "raw" / "opentargets_sample.json"
 OUT_DIR = ROOT / "data" / "processed"
@@ -42,8 +43,17 @@ def _normalize_association(row: dict) -> dict:
     }
 
 
-def transform(data: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
-    associations = pd.DataFrame([_normalize_association(r) for r in data["associations"]])
+def transform(data: dict, *, strict: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
+    rows = data["associations"]
+    warning_count = 0
+    for row in rows:
+        for warning in validate_association(row, strict=strict):
+            warning_count += 1
+            if warning_count <= 10:
+                print(f"  warn: {warning}")
+    if warning_count:
+        print(f"Identifier validation: {warning_count} warning(s) across {len(rows)} associations")
+    associations = pd.DataFrame([_normalize_association(r) for r in rows])
     proteins = pd.DataFrame(data.get("proteins", []))
     return associations, proteins
 
@@ -51,6 +61,11 @@ def transform(data: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Open Targets JSON -> processed CSV")
     parser.add_argument("--input", type=Path, default=None, help="Raw JSON path")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail on invalid ENSG/EFO/MONDO ids (production bulk ingest)",
+    )
     args = parser.parse_args()
 
     raw_path = args.input or DEFAULT_RAW
@@ -65,7 +80,7 @@ def main() -> None:
     with raw_path.open(encoding="utf-8") as f:
         data = json.load(f)
 
-    associations, proteins = transform(data)
+    associations, proteins = transform(data, strict=args.strict)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     associations.to_csv(OUT_DIR / "associations.csv", index=False)
