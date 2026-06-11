@@ -71,7 +71,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ID | Task | Done when |
 |----|------|-----------|
 | ✓ **4.3** | `docs/PLATFORM.md` — all services, ports, compose order | One doc runs stack |
-| **4.4** | Notebook: one gene → graph queries + (optional) literature pointer | ≤15 min clone-to-run |
+| ✓ **4.4** | Notebook: one gene → graph queries + (optional) literature pointer | [notebooks/one_gene_exploration.ipynb](../notebooks/one_gene_exploration.ipynb) |
 | ✓ **5.2** | Tutorial: public data → Neo4j → API | [GETTING_STARTED.md](./GETTING_STARTED.md) |
 | ✓ **5.3** | `docs/BENCHMARKS.md` — nodes/edges, ingest time, search p95 | Graph size + ingest measured; latency harness `scripts/benchmark_api.py` |
 | ✓ **0.4** | README: associations ≠ causation (if not already prominent) | Non-goals visible |

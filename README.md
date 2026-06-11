@@ -23,6 +23,7 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 | FastAPI search, compare, batch-lookup, gene-report export | ✅ |
 | React search, gene/disease detail, compare pages | ✅ |
 | Force-directed graph + evidence chart | ✅ |
+| Jupyter notebook: one gene → API + Cypher + literature links | ✅ |
 | Full Docker Compose stack | ✅ |
 | GitHub Actions CI | ✅ |
 
@@ -36,7 +37,7 @@ BioInsight Graph models how research datasets can become **queryable knowledge g
 |--------|----------------------|-------------|
 | ![Search genes and diseases](docs/screenshot-search.png) | ![BRCA1 subgraph](docs/screenshot-graph.png) | [Full page](docs/screenshot-gene-detail.png) |
 
-Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). Docs: [GETTING_STARTED.md](docs/GETTING_STARTED.md) · [PLATFORM.md](docs/PLATFORM.md) · [BENCHMARKS.md](docs/BENCHMARKS.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md)
+Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (dev). Docs: [GETTING_STARTED.md](docs/GETTING_STARTED.md) · [Notebook (4.4)](notebooks/one_gene_exploration.ipynb) · [PLATFORM.md](docs/PLATFORM.md) · [BENCHMARKS.md](docs/BENCHMARKS.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md) · Ecosystem: [docs/PORTFOLIO_ROADMAP.md](docs/PORTFOLIO_ROADMAP.md)
 
 ### Demo walkthrough
 

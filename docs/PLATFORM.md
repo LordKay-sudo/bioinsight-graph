@@ -69,3 +69,4 @@ slice is the default for CI and offline demos.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — component diagram and request flow
 - [ONTOLOGY_SCHEMA.md](./ONTOLOGY_SCHEMA.md) — entity/relation/ID model
 - [BENCHMARKS.md](./BENCHMARKS.md) — graph size and latency numbers
+- [notebooks/one_gene_exploration.ipynb](../notebooks/one_gene_exploration.ipynb) — one-gene tutorial (roadmap 4.4)

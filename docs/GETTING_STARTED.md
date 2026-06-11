@@ -44,7 +44,18 @@ cd api && uvicorn app.main:app --reload --port 8000
 cd web && npm install && npm run dev
 ```
 
-## 5. Agent / MCP layer (optional)
+## 5. Notebook walkthrough (roadmap 4.4)
+
+With the stack running:
+
+```bash
+cd api && pip install -r requirements.txt -r ../notebooks/requirements.txt
+jupyter notebook ../notebooks/one_gene_exploration.ipynb
+```
+
+See [notebooks/README.md](../notebooks/README.md).
+
+## 6. Agent / MCP layer (optional)
 
 Point [embabel-mcp](https://github.com/LordKay-sudo/embabel-mcp) at `http://localhost:8000/api/v1`. Use MCP prompt **`public-data-to-mcp-tutorial`** for a guided Cursor setup.
 
