@@ -221,6 +221,7 @@ Base path: **`/api/v1`** · Interactive docs at **`/docs`** when the API is runn
 | `GET` | `/meta` | Data version, sources, disclaimer ([PROVENANCE.md](PROVENANCE.md)) |
 | `GET` | `/stats` | Node and relationship counts |
 | `GET` | `/genes?q=` | Search genes by symbol or name |
+| `GET` | `/resolve?query=&entity_type=` | Resolve symbol or disease name to canonical id (ambiguity notes) |
 | `GET` | `/diseases?q=` | Search diseases |
 | `GET` | `/genes/{id}` | Gene metadata + degree counts |
 | `GET` | `/genes/{id}/diseases` | Diseases for a gene, ranked by `score` (`min_score`, `limit`) |

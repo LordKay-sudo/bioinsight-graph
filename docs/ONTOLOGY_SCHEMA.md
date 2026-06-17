@@ -32,6 +32,7 @@ Compact schema \(S = (E, R, \Phi)\) for the disease–target knowledge graph. Ma
 | Ranked targets | `GET /genes/{id}/diseases`, `GET /diseases/{id}/genes` |
 | Evidence breakdown | `GET /genes/{id}/evidence` |
 | Federated identity | `GET /genes/{id}/external-links` |
+| Entity resolution | `GET /resolve?query=&entity_type=gene\|disease` |
 | Dataset trust | `GET /meta` |
 
 ## MCP mapping
@@ -40,6 +41,6 @@ Compact schema \(S = (E, R, \Phi)\) for the disease–target knowledge graph. Ma
 |----------|-----|
 | `get_target_evidence` | `/genes/{id}/evidence` |
 | `get_gene_external_links` | `/genes/{id}/external-links` |
-| `resolve_identifier` | `/genes?q=`, `/diseases?q=` (until dedicated resolve API) |
+| `resolve_identifier` | `GET /resolve` |
 
 See [SCHEMA_MIGRATION.md](./SCHEMA_MIGRATION.md) for Neo4j migration notes.

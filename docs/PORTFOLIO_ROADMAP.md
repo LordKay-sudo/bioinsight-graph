@@ -183,7 +183,7 @@ Sequential phases (~12 weeks). Adjust dates to your schedule; phases 4 and 5 can
 | 0.1 | `PROVENANCE.md` — licences, citations, data version, disclaimers | bioinsight-graph | ✓ |
 | 0.2 | `GET /meta` | bioinsight-graph | ✓ |
 | 0.3 | UI: version + disclaimer on main pages | bioinsight-graph | ✓ |
-| 0.4 | README section: associations vs causation | bioinsight-graph | open |
+| 0.4 | README section: associations vs causation | bioinsight-graph | ✓ |
 
 **Done when:** Every API consumer can read version + limits without reading code.
 
@@ -310,12 +310,12 @@ gantt
 
 ## Cross-repo checklist
 
-- [ ] bioinsight-graph: public data source cited with licence
-- [ ] bioinsight-graph: no clinical claims without disclaimer
-- [ ] bioinsight-graph: [HUMAN_IN_THE_LOOP.md](./HUMAN_IN_THE_LOOP.md) linked from README
-- [ ] kg-rag-demo: every answer traceable to a source passage
-- [ ] embabel-mcp: README states BioInsight is the primary application
-- [ ] Shared gene/disease IDs where both graphs mention the same entities
+- [x] bioinsight-graph: public data source cited with licence
+- [x] bioinsight-graph: no clinical claims without disclaimer
+- [x] bioinsight-graph: [HUMAN_IN_THE_LOOP.md](./HUMAN_IN_THE_LOOP.md) linked from README
+- [x] kg-rag-demo: every answer traceable to a source passage
+- [x] embabel-mcp: README states BioInsight is the primary application
+- [x] Shared gene/disease IDs where both graphs mention the same entities
 
 ---
 

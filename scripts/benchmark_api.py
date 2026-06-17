@@ -16,6 +16,7 @@ import urllib.request
 
 ENDPOINTS = [
     ("search_genes", "/api/v1/genes?q=BRCA"),
+    ("resolve_gene", "/api/v1/resolve?query=BRCA1&entity_type=gene"),
     ("gene_detail", "/api/v1/genes/ENSG00000012048"),
     ("gene_diseases", "/api/v1/genes/ENSG00000012048/diseases"),
     ("gene_evidence", "/api/v1/genes/ENSG00000012048/evidence"),

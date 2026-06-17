@@ -57,6 +57,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 | ✓ **2.1** | Ingest: Ensembl **ENSG** + EFO/MONDO on diseases | Validation on load (`app/identifiers.py`, ETL `--strict`) |
 | ✓ **2.2** | `GET /genes/{id}/external-links` (Ensembl, Open Targets, UniProt) | All demo genes resolve |
 | ✓ **2.3** | UI: “Open in Ensembl / Open Targets” on gene page | Links live |
+| ✓ **2.4** | `GET /resolve` — ontology-aware gene/disease resolution | MCP `resolve_identifier` + OpenAPI |
 | ✓ **3.1** | UI: evidence chart (by type) on gene detail | Matches API breakdown |
 | ✓ **3.2** | UI: disease page → top targets | Disease-centric workflow |
 | ✓ **3.3** | UI: compare genes (wire compare API) | Side-by-side diseases |
@@ -84,6 +85,7 @@ BioInsight’s target–disease graph comes from **bulk public ingest**, not sch
 |------------------|-----|
 | `/meta` | `data_version`, sources, disclaimer (exists) |
 | Evidence arrays on ranked associations | Hyperedge-like facts without a hypergraph DB |
+| `GET /resolve` | Ontology-aware symbol/name → canonical id for agents |
 | `/genes/{id}/external-links` | Federated identity story |
 | Stable `/api/v1` + OpenAPI | MCP and UI share contract |
 | Export with provenance columns | Auditable analyst handoff |

@@ -19,7 +19,7 @@
 
 ## Shipped
 
-- BioInsight: `/api/v1/meta`, `PROVENANCE.md`, UI footer version, search/gene/graph/compare, CI/Docker
+- BioInsight: `/api/v1/meta`, `GET /resolve`, `PROVENANCE.md`, UI footer version, search/gene/graph/compare, CI/Docker
 - embabel: tool profiles (minimal/standard/full), `build_target_dossier`, provenance footers, `compact-mode: off`, workflow never truncated, `docs/RESPONSE_POLICY.md`, `bioinsight://context-policy`
 - kg-rag: seed corpus, ask + graph UI, optional MCP via `KG_RAG_ENABLED`
 
@@ -39,11 +39,11 @@ GraphRAG ≠ enough (PRoH: planned multi-hop). Production biodata also needs **o
 
 ## Priority next (all repos)
 
-1. **BioInsight 1.x** — bulk ingest, evidence on relationships, API breakdown  
-2. **BioInsight 2.x** — ENSG/EFO, `docs/ONTOLOGY_SCHEMA.md`, external-links  
-3. **BioInsight 3.x** — evidence UI, disease page, compare, export  
-4. **embabel M1–M6, M8** — plan/route; dual-channel graph→literature  
-5. **kg-rag R1–R4** — citations; **R16–R17** extraction schema + normalization; **R5–R8** shared IDs  
+Portfolio phases 0–5 are shipped. Optional follow-ups:
+
+1. **Scale** — full Open Targets bulk ingest beyond frozen slice; re-record [BENCHMARKS.md](./BENCHMARKS.md)
+2. **Ops** — keep `ECOSYSTEM_CONTEXT.md` and [PORTFOLIO_ROADMAP.md](./PORTFOLIO_ROADMAP.md) in sync when shipping
+3. **Optional** — MCP architecture GIF (portfolio 5.4); embabel [MCP_DEMO.md](https://github.com/LordKay-sudo/embabel-mcp/blob/main/docs/MCP_DEMO.md) covers the flow today
 
 ---
 
@@ -84,4 +84,4 @@ kg-rag-demo/docs/ROADMAP.md               # R1–R15
 
 ---
 
-*Last updated: 2026-05-21 — refresh when phases ship.*
+*Last updated: 2026-06-17 — refresh when phases ship.*

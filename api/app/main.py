@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db import close_driver
-from app.routers import diseases, export, genes, health
+from app.routers import diseases, export, genes, health, resolve
 
 API_PREFIX = "/api/v1"
 
@@ -35,6 +35,7 @@ app.include_router(health.router, prefix=API_PREFIX)
 app.include_router(genes.router, prefix=API_PREFIX)
 app.include_router(diseases.router, prefix=API_PREFIX)
 app.include_router(export.router, prefix=API_PREFIX)
+app.include_router(resolve.router, prefix=API_PREFIX)
 
 
 @app.get("/")

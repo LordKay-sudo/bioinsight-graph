@@ -17,20 +17,41 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import urllib.request
+from collections.abc import Iterator
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
 
-# Open Targets FTP layout (associationByOverallDirect + evidence parquet as JSON export path)
 FTP_BASE = "https://ftp.ebi.ac.uk/pub/databases/opentargets/platform/{release}/output/etl/json"
 
 
-def _fetch_json(url: str) -> list[dict]:
-    with urllib.request.urlopen(url, timeout=120) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+def _list_part_files(assoc_dir_url: str) -> list[str]:
+    with urllib.request.urlopen(assoc_dir_url, timeout=120) as resp:
+        html = resp.read().decode("utf-8", errors="replace")
+    parts = sorted(set(re.findall(r'href="(part-[^"]+\.json)"', html)))
+    if not parts:
+        raise RuntimeError(f"No part-*.json files found at {assoc_dir_url}")
+    return parts
+
+
+def _iter_association_rows(assoc_dir_url: str) -> Iterator[dict]:
+    for part in _list_part_files(assoc_dir_url):
+        part_url = f"{assoc_dir_url}/{part}"
+        print(f"  reading {part}...")
+        with urllib.request.urlopen(part_url, timeout=300) as resp:
+            for raw_line in resp:
+                line = raw_line.decode("utf-8").strip()
+                if not line:
+                    continue
+                yield json.loads(line)
+
+
+def _target_id(row: dict) -> str | None:
+    return row.get("targetId") or row.get("target_id")
 
 
 def main() -> None:
@@ -45,11 +66,41 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    base = FTP_BASE.format(release=args.release)
-    assoc_url = f"{base}/associationByOverallDirect"
-    print(f"Fetching associations from {assoc_url} (this may take several minutes)...")
+    assoc_dir_url = f"{FTP_BASE.format(release=args.release)}/associationByOverallDirect/"
+    print(f"Fetching associations from {assoc_dir_url} (sharded JSON parts; may take several minutes)...")
+
+    allowed: set[str] = set()
+    associations: list[dict] = []
     try:
-        rows = _fetch_json(assoc_url)
+        for row in _iter_association_rows(assoc_dir_url):
+            target = _target_id(row)
+            if not target:
+                continue
+            if target not in allowed and len(allowed) >= args.max_genes:
+                continue
+            if target not in allowed:
+                allowed.add(target)
+            disease = row.get("diseaseId") or row.get("disease_id")
+            score = row.get("score") or row.get("associationScore") or 0.0
+            associations.append(
+                {
+                    "target_id": target,
+                    "symbol": row.get("targetSymbol", target),
+                    "name": row.get("targetName", target),
+                    "disease_id": disease,
+                    "disease_name": row.get("diseaseName", disease),
+                    "score": float(score),
+                    "source": "opentargets",
+                    "evidence_type": "genetic_association",
+                    "evidence": [
+                        {
+                            "evidence_type": "genetic_association",
+                            "source": "opentargets",
+                            "score": float(score),
+                        }
+                    ],
+                }
+            )
     except Exception as exc:
         print(
             "Bulk download failed. Use the frozen slice for offline/CI workflows:\n"
@@ -58,45 +109,6 @@ def main() -> None:
             file=sys.stderr,
         )
         raise SystemExit(1) from exc
-
-    gene_ids: list[str] = []
-    seen_genes: set[str] = set()
-    associations: list[dict] = []
-    for row in rows:
-        target = row.get("targetId") or row.get("target_id")
-        if not target or target in seen_genes:
-            continue
-        seen_genes.add(target)
-        gene_ids.append(target)
-        if len(gene_ids) >= args.max_genes:
-            break
-
-    allowed = set(gene_ids)
-    for row in rows:
-        target = row.get("targetId") or row.get("target_id")
-        if target not in allowed:
-            continue
-        disease = row.get("diseaseId") or row.get("disease_id")
-        score = row.get("score") or row.get("associationScore") or 0.0
-        associations.append(
-            {
-                "target_id": target,
-                "symbol": row.get("targetSymbol", target),
-                "name": row.get("targetName", target),
-                "disease_id": disease,
-                "disease_name": row.get("diseaseName", disease),
-                "score": float(score),
-                "source": "opentargets",
-                "evidence_type": "genetic_association",
-                "evidence": [
-                    {
-                        "evidence_type": "genetic_association",
-                        "source": "opentargets",
-                        "score": float(score),
-                    }
-                ],
-            }
-        )
 
     payload = {
         "meta": {
@@ -110,7 +122,9 @@ def main() -> None:
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"Wrote {len(associations)} associations for {len(gene_ids)} genes -> {args.output}")
+    print(
+        f"Wrote {len(associations)} associations for {len(allowed)} genes -> {args.output}"
+    )
 
 
 if __name__ == "__main__":
