@@ -35,7 +35,7 @@ Measured **2026-06-17** on Windows 10 after sharded `part-*.json` download fix:
 Reproduce:
 
 ```bash
-py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500
+py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500 --with-evidence
 py -3 -c "import json,pathlib; d=json.loads(pathlib.Path('data/raw/opentargets_bulk.json').read_text(encoding='utf-8')); a=d['associations']; print('genes', len({r['target_id'] for r in a}), 'diseases', len({r['disease_id'] for r in a}), 'assocs', len(a))"
 py -3 scripts/etl_opentargets.py --input data/raw/opentargets_bulk.json
 py -3 scripts/seed_neo4j.py   # requires Neo4j
@@ -49,7 +49,7 @@ py -3 scripts/seed_neo4j.py   # requires Neo4j
 |------|------|------|
 | `build_frozen_slice.py` (generate slice + ETL → CSV) | **~2.1 s** | Windows 10, local Python 3 |
 | `etl_opentargets.py` on bulk JSON (500 genes) | **~36 s** | Windows 10, 2026-06-17 |
-| `seed_neo4j.py` (load CSV → Neo4j) | *record on your host* | depends on Neo4j + graph size |
+| `seed_neo4j.py` on bulk CSV (272k associations, batched) | **~202 s** | Windows 10, Docker Neo4j, 2026-06-17 |
 
 Reproduce:
 
@@ -64,27 +64,36 @@ Measure-Command { py -3 scripts/seed_neo4j.py }
 
 ## API latency (frozen slice)
 
-Run the stack seeded with **frozen slice v2** (see [PLATFORM.md](./PLATFORM.md)), then:
-
-```bash
-py -3 scripts/benchmark_api.py --base-url http://localhost:8000 --iterations 200
-```
-
-The harness reports p50/p95/p99 per endpoint for `search`, `resolve`, `gene_detail`,
-`gene_diseases`, `gene_evidence`, and `stats`. Record the table here with your host spec:
+Measured **2026-06-11**, Windows 10, Docker Compose, `http://localhost:8001`:
 
 | Endpoint | p50 (ms) | p95 (ms) | p99 (ms) |
 |----------|---------:|---------:|---------:|
 | `search_genes` | 13.2 | 26.9 | 35.3 |
-| `resolve_gene` | *run harness* | *run harness* | *run harness* |
 | `gene_detail` | 10.3 | 21.4 | 28.9 |
 | `gene_diseases` | 13.3 | 31.8 | 42.7 |
 | `gene_evidence` | 12.5 | 22.7 | 32.1 |
 | `stats` | 8.3 | 27.8 | 36.3 |
 
-Previous frozen-slice run: **Windows 10**, Docker Compose stack, `benchmark_api.py --iterations 200` against `http://localhost:8001` (2026-06-11). Re-run after seeding to refresh `resolve_gene` and bulk-scale latency.
+## API latency (bulk slice)
 
-The frozen slice is small enough that latency is dominated by Neo4j round-trip + serialization rather than query complexity. Bulk seed (272k associations) will increase read latency — re-record after `seed_neo4j.py` on bulk CSV.
+After bulk seed (`272,726` associations), measured **2026-06-17** on Windows 10, local uvicorn → Docker Neo4j, `benchmark_api.py --iterations 200 --gene-id ENSG00000004478`:
+
+| Endpoint | p50 (ms) | p95 (ms) | p99 (ms) |
+|----------|---------:|---------:|---------:|
+| `search_genes` | 7.7 | 31.0 | 38.1 |
+| `resolve_gene` | 6.5 | 26.5 | 31.5 |
+| `gene_detail` | 7.8 | 31.1 | 34.5 |
+| `gene_diseases` | 15.6 | 35.2 | 55.6 |
+| `gene_evidence` | 14.0 | 35.3 | 53.6 |
+| `stats` | 6.5 | 27.5 | 33.9 |
+
+All bulk p95 values remain under the portfolio **200 ms** target on this host. Reproduce:
+
+```bash
+py -3 scripts/benchmark_api.py --base-url http://localhost:8000 --iterations 200
+```
+
+The harness auto-discovers a gene from the graph (or pass `--gene-id`).
 
 ## Scaling note
 

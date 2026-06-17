@@ -67,9 +67,24 @@ cd web && npm install && npm run dev      # http://localhost:5173
 
 ## Data refresh
 
-To ingest a newer Open Targets release instead of the frozen slice, see
-[PROVENANCE.md](../PROVENANCE.md) (bulk download → ETL `--strict` → seed). The frozen
-slice is the default for CI and offline demos.
+**Frozen slice (default):** `docker compose up --build` — seed runs `build_frozen_slice.py` inside `Dockerfile.seed`.
+
+**Bulk Open Targets slice (local host):**
+
+```bash
+py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500 --with-evidence
+py -3 scripts/etl_opentargets.py --input data/raw/opentargets_bulk.json --strict
+py -3 scripts/seed_neo4j.py --strict
+py -3 scripts/benchmark_api.py --base-url http://localhost:8000 --iterations 200
+```
+
+**Bulk via Docker** (mounts host `data/raw/opentargets_bulk.json`):
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.bulk.yml up --build
+```
+
+See [PROVENANCE.md](../PROVENANCE.md) for licence (CC0 1.0). The frozen slice remains the default for CI and offline demos.
 
 ## Related docs
 

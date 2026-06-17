@@ -6,6 +6,7 @@ Default release: 24.06 (June 2024) from FTP.
 Usage (requires network + disk; not run in CI):
 
     py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500
+    py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500 --with-evidence
     py -3 scripts/etl_opentargets.py --input data/raw/opentargets_bulk.json
     py -3 scripts/seed_neo4j.py
 
@@ -17,37 +18,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
-import urllib.request
-from collections.abc import Iterator
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
+sys.path.insert(0, str(ROOT / "scripts"))
 
-FTP_BASE = "https://ftp.ebi.ac.uk/pub/databases/opentargets/platform/{release}/output/etl/json"
-
-
-def _list_part_files(assoc_dir_url: str) -> list[str]:
-    with urllib.request.urlopen(assoc_dir_url, timeout=120) as resp:
-        html = resp.read().decode("utf-8", errors="replace")
-    parts = sorted(set(re.findall(r'href="(part-[^"]+\.json)"', html)))
-    if not parts:
-        raise RuntimeError(f"No part-*.json files found at {assoc_dir_url}")
-    return parts
-
-
-def _iter_association_rows(assoc_dir_url: str) -> Iterator[dict]:
-    for part in _list_part_files(assoc_dir_url):
-        part_url = f"{assoc_dir_url}/{part}"
-        print(f"  reading {part}...")
-        with urllib.request.urlopen(part_url, timeout=300) as resp:
-            for raw_line in resp:
-                line = raw_line.decode("utf-8").strip()
-                if not line:
-                    continue
-                yield json.loads(line)
+from opentargets_ftp import attach_evidence, ftp_dir_url, iter_json_lines
 
 
 def _target_id(row: dict) -> str | None:
@@ -59,6 +37,11 @@ def main() -> None:
     parser.add_argument("--release", default="24.06", help="Open Targets release folder, e.g. 24.06")
     parser.add_argument("--max-genes", type=int, default=500, help="Cap unique targets in output JSON")
     parser.add_argument(
+        "--with-evidence",
+        action="store_true",
+        help="Attach typed evidence rows from Open Targets evidence shards (slower)",
+    )
+    parser.add_argument(
         "--output",
         type=Path,
         default=RAW_DIR / "opentargets_bulk.json",
@@ -66,13 +49,13 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    assoc_dir_url = f"{FTP_BASE.format(release=args.release)}/associationByOverallDirect/"
+    assoc_dir_url = ftp_dir_url(args.release, "associationByOverallDirect")
     print(f"Fetching associations from {assoc_dir_url} (sharded JSON parts; may take several minutes)...")
 
     allowed: set[str] = set()
     associations: list[dict] = []
     try:
-        for row in _iter_association_rows(assoc_dir_url):
+        for row in iter_json_lines(assoc_dir_url, label="associations"):
             target = _target_id(row)
             if not target:
                 continue
@@ -110,9 +93,15 @@ def main() -> None:
         )
         raise SystemExit(1) from exc
 
+    if args.with_evidence:
+        print("Attaching typed evidence from Open Targets evidence shards...")
+        attached = attach_evidence(associations, release=args.release, allowed_genes=allowed)
+        print(f"Attached {attached} evidence row(s) across {len(associations)} associations")
+
     payload = {
         "meta": {
-            "data_version": f"opentargets-{args.release}-bulk",
+            "data_version": f"opentargets-{args.release}-bulk"
+            + ("-evidence" if args.with_evidence else ""),
             "source": "opentargets-ftp",
             "release": args.release,
         },

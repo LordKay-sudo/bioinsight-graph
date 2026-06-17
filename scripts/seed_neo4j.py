@@ -16,6 +16,7 @@ from app.identifiers import validate_association  # noqa: E402
 
 INIT_CYPHER = (ROOT / "scripts" / "neo4j" / "init.cypher").read_text(encoding="utf-8")
 ASSOC_PATH = ROOT / "data" / "processed" / "associations.csv"
+BATCH_SIZE = 1000
 
 
 def run_constraints(session) -> None:
@@ -70,29 +71,40 @@ def seed(driver, *, strict: bool = False) -> None:
                 name=row["disease_name"],
             )
 
-        for _, row in assoc.iterrows():
-            evidence_json = row.get("evidence_json", "[]")
-            if pd.isna(evidence_json):
-                evidence_json = "[]"
+        assoc_rows = assoc.to_dict("records")
+        for start in range(0, len(assoc_rows), BATCH_SIZE):
+            batch = []
+            for row in assoc_rows[start : start + BATCH_SIZE]:
+                evidence_json = row.get("evidence_json", "[]")
+                if pd.isna(evidence_json):
+                    evidence_json = "[]"
+                batch.append(
+                    {
+                        "target_id": row["target_id"],
+                        "disease_id": row["disease_id"],
+                        "score": float(row["score"]),
+                        "source": row.get("source", "opentargets"),
+                        "evidence_type": row.get("evidence_type", "genetic_association"),
+                        "evidence_json": str(evidence_json),
+                        "study_id": _optional_str(row.get("study_id")),
+                    }
+                )
             session.run(
                 """
-                MATCH (g:Gene {id: $gene_id})
-                MATCH (d:Disease {id: $disease_id})
+                UNWIND $rows AS row
+                MATCH (g:Gene {id: row.target_id})
+                MATCH (d:Disease {id: row.disease_id})
                 MERGE (g)-[r:ASSOCIATED_WITH]->(d)
-                SET r.score = $score,
-                    r.source = $source,
-                    r.evidence_type = $evidence_type,
-                    r.evidence_json = $evidence_json,
-                    r.study_id = $study_id
+                SET r.score = row.score,
+                    r.source = row.source,
+                    r.evidence_type = row.evidence_type,
+                    r.evidence_json = row.evidence_json,
+                    r.study_id = row.study_id
                 """,
-                gene_id=row["target_id"],
-                disease_id=row["disease_id"],
-                score=float(row["score"]),
-                source=row.get("source", "opentargets"),
-                evidence_type=row.get("evidence_type", "genetic_association"),
-                evidence_json=str(evidence_json),
-                study_id=_optional_str(row.get("study_id")),
+                rows=batch,
             )
+            if (start // BATCH_SIZE) % 50 == 0 and start:
+                print(f"  associations: {start}/{len(assoc_rows)}...")
 
         for _, row in proteins.iterrows():
             session.run(
