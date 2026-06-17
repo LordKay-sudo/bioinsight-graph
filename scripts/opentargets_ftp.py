@@ -27,6 +27,13 @@ def ftp_dir_url(release: str, *parts: str) -> str:
     return f"{base}/{suffix}/" if suffix else f"{base}/"
 
 
+def evidence_source_dir(source: str) -> str:
+    """Open Targets evidence FTP folders use ``sourceId=chembl`` style paths."""
+    if source.startswith("sourceId="):
+        return source.rstrip("/")
+    return f"sourceId={source}"
+
+
 def list_part_files(dir_url: str) -> list[str]:
     with urllib.request.urlopen(dir_url, timeout=120) as resp:
         html = resp.read().decode("utf-8", errors="replace")
@@ -84,7 +91,8 @@ def attach_evidence(
     sources = sources or list(DEFAULT_EVIDENCE_SOURCES)
     attached = 0
 
-    for source_dir in sources:
+    for source_name in sources:
+        source_dir = evidence_source_dir(source_name)
         dir_url = ftp_dir_url(release, "evidence", source_dir)
         try:
             rows = iter_json_lines(dir_url, label=source_dir)

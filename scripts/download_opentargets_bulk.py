@@ -7,6 +7,7 @@ Usage (requires network + disk; not run in CI):
 
     py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500
     py -3 scripts/download_opentargets_bulk.py --release 24.06 --max-genes 500 --with-evidence
+    py -3 scripts/attach_opentargets_evidence.py --input data/raw/opentargets_bulk.json --output data/raw/opentargets_bulk_evidence.json
     py -3 scripts/etl_opentargets.py --input data/raw/opentargets_bulk.json
     py -3 scripts/seed_neo4j.py
 
