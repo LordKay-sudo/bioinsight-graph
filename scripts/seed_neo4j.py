@@ -130,6 +130,14 @@ def seed(driver, *, strict: bool = False) -> None:
         ).single()
         print(f"Seeded: {counts['genes']} genes, {counts['diseases']} diseases, {counts['associations']} associations")
 
+    # GapForge case studies (programs / trials / hypotheses) — after associations
+    scripts_dir = Path(__file__).resolve().parent
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    from seed_gapforge import seed_gapforge  # noqa: E402
+
+    seed_gapforge(driver)
+
 
 def main() -> None:
     import argparse

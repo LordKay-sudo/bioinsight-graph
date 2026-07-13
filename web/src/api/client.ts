@@ -192,4 +192,147 @@ export const api = {
     ),
   geneReportUrl: (id: string, format: "json" | "tsv" = "tsv") =>
     `${API_BASE}/api/v1/export/gene-report?gene_id=${encodeURIComponent(id)}&format=${format}`,
+
+  // GapForge
+  listPrograms: () => fetchJson<ProgramSummary[]>("/api/v1/programs"),
+  getProgram: (id: string) =>
+    fetchJson<ProgramDetail>(`/api/v1/programs/${encodeURIComponent(id)}`),
+  getProgramDossier: (id: string) =>
+    fetchJson<ProgramDossier>(`/api/v1/programs/${encodeURIComponent(id)}/dossier`),
+  getProgramTaxonomy: (id: string) =>
+    fetchJson<ProgramTaxonomy>(`/api/v1/programs/${encodeURIComponent(id)}/taxonomy`),
+  listGaps: (programId?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (programId) q.set("program_id", programId);
+    if (status) q.set("status", status);
+    const qs = q.toString();
+    return fetchJson<GapHypothesisSummary[]>(`/api/v1/gaps${qs ? `?${qs}` : ""}`);
+  },
+  getGap: (id: string) => fetchJson<GapHypothesisDetail>(`/api/v1/gaps/${encodeURIComponent(id)}`),
+  runCritic: (id: string, extra?: string) =>
+    fetch(`${API_BASE}/api/v1/gaps/${encodeURIComponent(id)}/critic`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(extra ? { extra_counter_evidence: extra } : {}),
+    }).then(async (res) => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.json() as Promise<CriticResponse>;
+    }),
+  reviewQueue: (status = "needs_review") =>
+    fetchJson<ReviewQueueItem[]>(
+      `/api/v1/reviews/queue?status=${encodeURIComponent(status)}`
+    ),
+  decideReview: (gapId: string, decision: string, reviewer: string, notes: string) =>
+    fetch(`${API_BASE}/api/v1/reviews/${encodeURIComponent(gapId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision, reviewer, notes }),
+    }).then(async (res) => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.json() as Promise<ReviewDecisionResponse>;
+    }),
+  reviewBundleUrl: (programId: string) =>
+    `${API_BASE}/api/v1/export/review-bundle?program_id=${encodeURIComponent(programId)}`,
 };
+
+export interface ProgramSummary {
+  id: string;
+  name: string;
+  status?: string | null;
+  indication_name?: string | null;
+  moa?: string | null;
+  stall_summary?: string | null;
+  drug_name?: string | null;
+  trial_count: number;
+  gap_count: number;
+}
+
+export interface TrialSummary {
+  id: string;
+  nct_id?: string | null;
+  phase?: string | null;
+  status?: string | null;
+  primary_endpoint?: string | null;
+  outcome_summary?: string | null;
+  url?: string | null;
+}
+
+export interface GapHypothesisSummary {
+  id: string;
+  gap_class: string;
+  claim: string;
+  confidence: number;
+  status: string;
+  risk_tier: string;
+  insufficient_evidence: boolean;
+  program_id?: string | null;
+  suggested_experiment?: string | null;
+  provenance_hash?: string | null;
+  critic_notes?: string | null;
+  literature_refs: Array<{ title?: string; url?: string; note?: string }>;
+}
+
+export interface GapHypothesisDetail extends GapHypothesisSummary {
+  program_name?: string | null;
+  cou?: string | null;
+  critic_confidence?: number | null;
+  supported_by: unknown[];
+  contradicted_by: unknown[];
+  reviews: unknown[];
+}
+
+export interface ProgramDetail extends ProgramSummary {
+  cou_note?: string | null;
+  case_study_id?: string | null;
+  drug?: {
+    id: string;
+    name: string;
+    synonyms: string[];
+    chembl_id?: string | null;
+  } | null;
+  disease?: { id: string; name?: string } | null;
+  genes: Array<{ id?: string; symbol?: string; name?: string }>;
+  trials: TrialSummary[];
+  gaps: GapHypothesisSummary[];
+}
+
+export interface ProgramDossier {
+  program: ProgramDetail;
+  cou: string;
+  risk_tier_note: string;
+  verify_ui_path: string;
+}
+
+export interface ProgramTaxonomy {
+  program_id: string;
+  program_name: string;
+  dimensions: Array<{ code: string; label: string; evidence_density: number }>;
+  note?: string | null;
+}
+
+export interface ReviewQueueItem {
+  hypothesis: GapHypothesisSummary;
+  program_id: string;
+  program_name?: string | null;
+  verify_ui_path: string;
+}
+
+export interface CriticResponse {
+  gap_id: string;
+  critic_notes: string;
+  confidence_after: number;
+  status: string;
+  cou: string;
+  ran_at: string;
+}
+
+export interface ReviewDecisionResponse {
+  gap_id: string;
+  review_id: string;
+  decision: string;
+  status: string;
+  reviewer: string;
+  decided_at: string;
+  message: string;
+  cou: string;
+}

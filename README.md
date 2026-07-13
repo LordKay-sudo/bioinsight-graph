@@ -47,6 +47,21 @@ Open the app: **http://localhost:8080** (Docker) or **http://localhost:5173** (d
 
 Before trusting agent or MCP output, review associations in the web UI. See [docs/HUMAN_IN_THE_LOOP.md](docs/HUMAN_IN_THE_LOOP.md).
 
+### GapForge (translational gap hunter)
+
+Educational stalled-program analysis — **not** molecule design.
+
+**Product home:** [github.com/LordKay-sudo/gapforge](https://github.com/LordKay-sudo/gapforge)
+
+| Surface | URL / path |
+|---------|------------|
+| Design | [docs/GAPFORGE.md](docs/GAPFORGE.md) |
+| Programs UI | `/programs` (Flurizan AD case study) |
+| HITL review | `/gaps/review` |
+| Seed | `data/gapforge/flurizan_case.json` → `scripts/seed_gapforge.py` |
+
+Risk tiers: L0–L1 explore/summarize; **L2 hypotheses require human approve/reject**; L3 chemistry/dosing blocked.
+
 ### Non-goals
 
 - **Not for clinical diagnosis or treatment decisions**

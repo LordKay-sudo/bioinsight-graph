@@ -43,7 +43,40 @@ BIOINSIGHT_HITL_ENABLED=true
 - [ ] Disclaimer stated: Open Targets–style **sample** data
 - [ ] Reviewer name or “demo review” noted if required by your process
 
+---
+
+## GapForge HITL (translational gap hypotheses)
+
+GapForge L2 outputs (**gap hypotheses**) always start as `needs_review`. Agents and MCP tools may **propose** and **criticize**; only the web review queue (or explicit `POST /reviews/{gap_id}`) can **approve** or **reject**.
+
+### UI workflow (ground truth)
+
+| Step | Action |
+|------|--------|
+| Open programs | http://localhost:8080/programs — select **Flurizan AD program** |
+| Inspect dossier | Trials, linked genes/diseases, taxonomy densities |
+| Review queue | http://localhost:8080/gaps/review — approve / reject / request more |
+| Export | Only **approved** cards appear in `team_conclusions` of the review bundle |
+
+### Risk tiers (reminder)
+
+- **L0–L1** — explore / cited summaries (auto)
+- **L2** — gap hypotheses — **HITL required**
+- **L3** — chemistry / dosing / patient advice — **blocked**
+
+See [GAPFORGE.md](./GAPFORGE.md) for COU and dual-channel evidence rules.
+
+### Checklist before treating a gap card as a team conclusion
+
+- [ ] Claim is explanatory, not a treatment recommendation
+- [ ] Dual-channel evidence present (structured + citation) or `insufficient_evidence` flagged
+- [ ] Critic notes reviewed
+- [ ] Cross-checked program page / Neo4j
+- [ ] Reviewer name recorded on approve/reject
+
 ## Related
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — URLs and ERD
+- [GAPFORGE.md](GAPFORGE.md) — GapForge design
 - [DEMO.md](DEMO.md) — recording walkthrough GIFs
+- [ROADMAP.md](ROADMAP.md) — task IDs including GapForge G0–G5

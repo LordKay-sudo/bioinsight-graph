@@ -185,3 +185,166 @@ class BatchLookupHit(BaseModel):
 class BatchLookupResponse(BaseModel):
     hits: list[BatchLookupHit] = Field(default_factory=list)
     unresolved: list[str] = Field(default_factory=list)
+
+
+# --- GapForge ---
+
+
+class DrugSummary(BaseModel):
+    id: str
+    name: str
+    synonyms: list[str] = Field(default_factory=list)
+    chembl_id: str | None = None
+
+
+class TrialSummary(BaseModel):
+    id: str
+    nct_id: str | None = None
+    phase: str | None = None
+    status: str | None = None
+    primary_endpoint: str | None = None
+    outcome_summary: str | None = None
+    url: str | None = None
+
+
+class LiteratureRef(BaseModel):
+    title: str
+    url: str | None = None
+    note: str | None = None
+
+
+class GapHypothesisSummary(BaseModel):
+    id: str
+    gap_class: str
+    claim: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    status: str = "needs_review"
+    risk_tier: str = "L2"
+    insufficient_evidence: bool = False
+    program_id: str | None = None
+    suggested_experiment: str | None = None
+    provenance_hash: str | None = None
+    critic_notes: str | None = None
+    literature_refs: list = Field(default_factory=list)
+
+
+class GapHypothesisDetail(GapHypothesisSummary):
+    program_name: str | None = None
+    cou: str | None = None
+    critic_confidence: float | None = None
+    supported_by: list = Field(default_factory=list)
+    contradicted_by: list = Field(default_factory=list)
+    reviews: list = Field(default_factory=list)
+
+
+class ProgramSummary(BaseModel):
+    id: str
+    name: str
+    status: str | None = None
+    indication_name: str | None = None
+    moa: str | None = None
+    stall_summary: str | None = None
+    drug_name: str | None = None
+    trial_count: int = 0
+    gap_count: int = 0
+
+
+class ProgramDetail(ProgramSummary):
+    cou_note: str | None = None
+    case_study_id: str | None = None
+    drug: DrugSummary | None = None
+    disease: dict | None = None
+    genes: list = Field(default_factory=list)
+    trials: list[TrialSummary] = Field(default_factory=list)
+    gaps: list[GapHypothesisSummary] = Field(default_factory=list)
+
+
+class ProgramDossier(BaseModel):
+    program: ProgramDetail
+    cou: str
+    risk_tier_note: str
+    verify_ui_path: str
+
+
+class TaxonomyDimension(BaseModel):
+    code: str
+    label: str
+    evidence_density: float = Field(ge=0.0, le=1.0)
+
+
+class ProgramTaxonomy(BaseModel):
+    program_id: str
+    program_name: str
+    dimensions: list[TaxonomyDimension]
+    note: str | None = None
+
+
+class ProposeGapsRequest(BaseModel):
+    program_id: str
+    gap_class: str
+    claim: str
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+    suggested_experiment: str | None = None
+    insufficient_evidence: bool = False
+    supported_by_trial_ids: list[str] = Field(default_factory=list)
+    supported_by_gene_ids: list[str] = Field(default_factory=list)
+    literature_refs: list[LiteratureRef] = Field(default_factory=list)
+    id: str | None = None
+
+
+class ProposeGapsResponse(BaseModel):
+    hypothesis: GapHypothesisDetail
+    message: str
+    cou: str
+
+
+class CriticRequest(BaseModel):
+    extra_counter_evidence: str | None = None
+    link_trial_as_contradiction: str | None = None
+
+
+class CriticResponse(BaseModel):
+    gap_id: str
+    critic_notes: str
+    confidence_after: float
+    status: str
+    cou: str
+    ran_at: str
+
+
+class ReviewQueueItem(BaseModel):
+    hypothesis: GapHypothesisSummary
+    program_id: str
+    program_name: str | None = None
+    verify_ui_path: str
+
+
+class ReviewDecisionRequest(BaseModel):
+    decision: str = Field(..., description="approve | reject | request_more")
+    reviewer: str | None = None
+    notes: str | None = None
+
+
+class ReviewDecisionResponse(BaseModel):
+    gap_id: str
+    review_id: str
+    decision: str
+    status: str
+    reviewer: str
+    decided_at: str
+    message: str
+    cou: str
+
+
+class ReviewBundle(BaseModel):
+    exported_at: str
+    cou: str
+    data_version: str
+    api_version: str
+    program_id: str | None = None
+    program_name: str | None = None
+    hypotheses: list[GapHypothesisSummary] = Field(default_factory=list)
+    team_conclusions: list[GapHypothesisSummary] = Field(default_factory=list)
+    disclaimer: str
+    note: str | None = None
+    raw_meta: dict = Field(default_factory=dict)
